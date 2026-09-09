@@ -162,6 +162,31 @@ async def test_removed_never_opens_reauth(
     assert state_of(hass, "sensor.emma_last_feed").state == "unavailable"
 
 
+async def test_removing_the_entry_takes_its_issues_with_it(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """The way back from a Removal is a new entry, so the old one must clear.
+
+    `member_removed` is persistent by design — it has to survive a restart,
+    because nothing about it heals — and the README's own instruction is to
+    delete the entry and add the integration again. Left behind, it is a red
+    card about a Household this Home Assistant no longer has, and it is not
+    fixable, so nobody can dismiss it either.
+    """
+    mock_state(aioclient_mock)
+    assert await setup_entry(hass, entry, aioclient_mock)
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.get(STATE_URL, status=403, json={"code": "removed"})
+    await entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+    assert issue_present(hass, ISSUE_MEMBER_REMOVED, entry) is not None
+
+    assert await hass.config_entries.async_remove(entry.entry_id)
+    await hass.async_block_till_done()
+    assert issue_present(hass, ISSUE_MEMBER_REMOVED, entry) is None
+
+
 async def test_hosting_paused_polls_gently_and_recovers_quietly(
     hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
 ) -> None:

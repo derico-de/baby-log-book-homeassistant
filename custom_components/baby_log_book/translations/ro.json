@@ -24,6 +24,10 @@
       "confirm": {
         "title": "Folosește acest link",
         "description": "Server: {origin}\nPentru: {name}\n\nFolosirea consumă linkul: un link de acces funcționează o singură dată. Deocamdată nu s-a folosit nimic."
+      },
+      "confirm_unnamed": {
+        "title": "Folosește acest link",
+        "description": "Server: {origin}\n\nAcest link nu poartă niciun nume: o privire spune doar că este bun.\n\nFolosirea consumă linkul: un link de acces funcționează o singură dată. Deocamdată nu s-a folosit nimic."
       }
     },
     "error": {

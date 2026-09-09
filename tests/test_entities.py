@@ -10,12 +10,17 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 from custom_components.baby_log_book import async_remove_config_entry_device
-from custom_components.baby_log_book.const import DOMAIN
+from custom_components.baby_log_book.const import (
+    CONF_HOUSEHOLD_NAME,
+    DEFAULT_HOUSEHOLD_NAME,
+    DOMAIN,
+)
 
 from .conftest import (
     BABY_ID,
     HOUSEHOLD_ID,
     baby,
+    entry_data,
     mock_state,
     setup_entry,
     state_of,
@@ -236,3 +241,27 @@ async def test_a_baby_who_is_still_there_is_not_removable(
     assert not await async_remove_config_entry_device(hass, entry, hers)
     # And the Household's device is never removable while the entry is loaded.
     assert not await async_remove_config_entry_device(hass, entry, household)
+
+
+async def test_an_unnamed_household_still_gets_a_name(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Naming a Household is optional in the app; a blank device is not an option.
+
+    Nothing in the app displays the Household's name, so plenty of them never
+    get one — and the wall panel is where that first shows, because Home
+    Assistant writes it on a device and into three entity ids.
+    """
+    nameless = MockConfigEntry(
+        domain=DOMAIN,
+        title="",
+        unique_id=HOUSEHOLD_ID,
+        data={**entry_data(), CONF_HOUSEHOLD_NAME: ""},
+    )
+    mock_state(aioclient_mock, state_payload(name=""))
+    assert await setup_entry(hass, nameless, aioclient_mock)
+
+    household = dr.async_get(hass).async_get_device({(DOMAIN, f"household_{HOUSEHOLD_ID}")})
+    assert household is not None
+    assert household.name == DEFAULT_HOUSEHOLD_NAME
+    assert state_of(hass, "binary_sensor.baby_log_book_caregiving").state == "on"

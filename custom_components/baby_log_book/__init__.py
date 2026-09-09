@@ -42,6 +42,7 @@ from .const import (
 )
 from .coordinator import BabyLogBookConfigEntry, BabyLogBookCoordinator
 from .entity import baby_of
+from .issues import async_clear_all
 
 PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.BUTTON, Platform.SENSOR]
 
@@ -125,6 +126,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: BabyLogBookConfigEntry) 
 async def async_unload_entry(hass: HomeAssistant, entry: BabyLogBookConfigEntry) -> bool:
     """Let go of everything; the stream is a background task of the entry's."""
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_entry(hass: HomeAssistant, entry: BabyLogBookConfigEntry) -> None:
+    """An entry that is gone takes its three repair issues with it.
+
+    `member_removed` is persistent on purpose — nothing about a Removal heals,
+    so it has to survive a restart — and the way back from one is to delete this
+    entry and add the integration again. Left standing it would be a red card
+    about a Household this Home Assistant no longer has, and not a fixable one,
+    so nobody could dismiss it either.
+    """
+    async_clear_all(hass, entry.entry_id)
 
 
 async def async_remove_config_entry_device(

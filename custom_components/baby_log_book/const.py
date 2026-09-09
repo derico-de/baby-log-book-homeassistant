@@ -31,6 +31,12 @@ CONF_HOUSEHOLD_NAME: Final = "household_name"
 CONF_DEVICE_ID: Final = "device_id"
 CONF_CLAIM_LINK: Final = "claim_link"
 
+#: What the Household is called when it has not been named. The app leaves the
+#: name optional — nothing in it displays one — but Home Assistant has to write
+#: something on the entry, on the device and into three entity ids, and a blank
+#: there reads as a bug rather than as a Household nobody bothered to name.
+DEFAULT_HOUSEHOLD_NAME: Final = "Baby Log Book"
+
 # --- cadence (spec §6.4) -------------------------------------------------
 
 #: A burst of revisions is one refresh.

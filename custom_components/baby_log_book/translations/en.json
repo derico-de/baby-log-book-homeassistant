@@ -24,6 +24,10 @@
       "confirm": {
         "title": "Claim this link",
         "description": "Server: {origin}\nFor: {name}\n\nClaiming spends the link: a Claim Link works only once. Nothing has been claimed yet."
+      },
+      "confirm_unnamed": {
+        "title": "Claim this link",
+        "description": "Server: {origin}\n\nThis link carries no name: looking at one says only that it is good.\n\nClaiming spends the link: a Claim Link works only once. Nothing has been claimed yet."
       }
     },
     "error": {

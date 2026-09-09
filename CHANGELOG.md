@@ -87,3 +87,28 @@ version` = the git tag = the GitHub release, bumped together in one commit.
   revoking it, signing back in, a dashboard card, two automations to copy, a
   one-press bottle script, what it deliberately does not do, and the
   compatibility table.
+
+### Fixed
+
+- A Household that has never been named arrives with a name anyway. Naming one
+  is optional in the app, and nothing in the app displays it, so plenty of them
+  never get one — but Home Assistant writes it on the entry, on a device and
+  into three entity ids, and a blank there reads as a bug. Unnamed Households are
+  **Baby Log Book** on this side. What the server sent is kept as it was; only
+  what is shown falls back.
+
+- A sign-in link is confirmed in its own words. The preview a Claim Link gives is
+  deliberately thin and a sign-in link carries no name at all, so the confirmation
+  read *For:* and then stopped. It now has a second wording, in all three
+  languages, for a link that names nobody — which is a sign-in link and a founding
+  link both.
+
+- Deleting the entry takes its repair issues with it. The removed-Member issue is
+  persistent on purpose, because nothing about a Removal heals; the way back from
+  one is to delete the entry and add the integration again, which left a red card
+  standing about a Household that was no longer there — and not a fixable one, so
+  nobody could dismiss it either.
+
+- The README said a button is *hidden* where the app would hide it. It goes
+  unavailable, which Home Assistant greys out and labels; the `visibility`
+  condition that does hide the tile is named for anybody who wants that.

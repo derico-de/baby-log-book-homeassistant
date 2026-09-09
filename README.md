@@ -78,11 +78,16 @@ ever logged, and never go away again.
 
 On the Household device: `binary_sensor.<household>_caregiving`, and two
 diagnostics — when the panel last heard the server, and how many presses are
-still queued.
+still queued. Naming the Household is optional in the app, and one that has not
+been named is called **Baby Log Book** here, because Home Assistant has to write
+something on the device.
 
 Six buttons per baby: *Sleep*, *She's awake*, *Feed*, *End feed*, *Tummy time*,
-*Off her tummy*. A button is hidden where the app would hide it — no *Sleep* while
-one is running — which is a convenience, not a rule. The rules are the server's.
+*Off her tummy*. A button goes unavailable where the app would put it away — no
+*Sleep* while one is running — which is a convenience, not a rule. The rules are
+the server's. Home Assistant greys an unavailable entity out rather than hiding
+it; hide the tile too, if you want the wall quiet, with a `visibility` condition
+on the card.
 
 ## A dashboard
 

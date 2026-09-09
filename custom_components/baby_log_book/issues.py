@@ -11,6 +11,8 @@ key is the bare name.
 
 from __future__ import annotations
 
+from typing import Final
+
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import issue_registry as ir
 
@@ -78,7 +80,20 @@ def async_integration_outdated(hass: HomeAssistant, entry_id: str) -> None:
     )
 
 
+#: The three kinds, in one place. Anything that has to name all of them —
+#: taking an entry's issues down with it — asks here rather than restating the
+#: roster and letting the two lists drift.
+KINDS: Final = (ISSUE_MEMBER_REMOVED, ISSUE_HOSTING_PAUSED, ISSUE_INTEGRATION_OUTDATED)
+
+
 @callback
 def async_clear(hass: HomeAssistant, kind: str, entry_id: str) -> None:
     """Take one down again. Idempotent, so nobody has to ask first."""
     ir.async_delete_issue(hass, DOMAIN, issue_id(kind, entry_id))
+
+
+@callback
+def async_clear_all(hass: HomeAssistant, entry_id: str) -> None:
+    """Take all three down: what an entry raised, an entry takes with it."""
+    for kind in KINDS:
+        async_clear(hass, kind, entry_id)

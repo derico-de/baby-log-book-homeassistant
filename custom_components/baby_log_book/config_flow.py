@@ -47,6 +47,7 @@ from .const import (
     CONF_MEMBER_ID,
     CONF_ORIGIN,
     CONF_SESSION,
+    DEFAULT_HOUSEHOLD_NAME,
     DOMAIN,
     MIN_SERVER_VERSION,
 )
@@ -125,6 +126,17 @@ class BabyLogBookConfigFlow(ConfigFlow, domain=DOMAIN):
             description_placeholders=placeholders or None,
         )
 
+    async def async_step_confirm_unnamed(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """The same confirmation, for a link that carries no name.
+
+        A Rescue Link and a Founding Link both preview nameless: the preview is
+        deliberately thin and says only that the link is good. One step id per
+        wording, because a translation cannot leave a line out.
+        """
+        return await self.async_step_confirm(user_input)
+
     async def async_step_confirm(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -132,13 +144,11 @@ class BabyLogBookConfigFlow(ConfigFlow, domain=DOMAIN):
         assert self._preview is not None
 
         if user_input is None:
+            name = self._preview.display_name or ""
             return self.async_show_form(
-                step_id="confirm",
+                step_id="confirm" if name else "confirm_unnamed",
                 data_schema=vol.Schema({}),
-                description_placeholders={
-                    "origin": self._origin,
-                    "name": self._preview.display_name or "",
-                },
+                description_placeholders={"origin": self._origin, "name": name},
             )
 
         client = self._client()
@@ -184,7 +194,9 @@ class BabyLogBookConfigFlow(ConfigFlow, domain=DOMAIN):
         # Assistant, not a second entry.
         await self.async_set_unique_id(claimed.household_id)
         self._abort_if_unique_id_configured()
-        return self.async_create_entry(title=claimed.household_name, data=data)
+        return self.async_create_entry(
+            title=claimed.household_name or DEFAULT_HOUSEHOLD_NAME, data=data
+        )
 
     # --- re-auth ---------------------------------------------------------
 

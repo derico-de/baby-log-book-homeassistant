@@ -50,6 +50,7 @@ from .const import (
     CONF_HOUSEHOLD_ID,
     CONF_HOUSEHOLD_NAME,
     CONF_MEMBER_ID,
+    DEFAULT_HOUSEHOLD_NAME,
     DOMAIN,
     ISSUE_HOSTING_PAUSED,
     ISSUE_INTEGRATION_OUTDATED,
@@ -101,7 +102,9 @@ class BabyLogBookCoordinator(DataUpdateCoordinator[HubState]):
         )
         self.client = client
         self.household_id: str = entry.data[CONF_HOUSEHOLD_ID]
-        self.household_name: str = entry.data.get(CONF_HOUSEHOLD_NAME) or entry.title
+        self.household_name: str = (
+            entry.data.get(CONF_HOUSEHOLD_NAME) or entry.title or DEFAULT_HOUSEHOLD_NAME
+        )
         self.member_id: str = entry.data[CONF_MEMBER_ID]
         self.device_id: str = entry.data[CONF_DEVICE_ID]
         #: What a press queued and the server has not taken yet.

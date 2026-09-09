@@ -24,6 +24,10 @@
       "confirm": {
         "title": "Diesen Link einlösen",
         "description": "Server: {origin}\nFür: {name}\n\nDas Einlösen verbraucht den Link: er funktioniert nur einmal. Bisher ist nichts eingelöst."
+      },
+      "confirm_unnamed": {
+        "title": "Diesen Link einlösen",
+        "description": "Server: {origin}\n\nDieser Link trägt keinen Namen: ein Blick darauf sagt nur, dass er gültig ist.\n\nDas Einlösen verbraucht den Link: er funktioniert nur einmal. Bisher ist nichts eingelöst."
       }
     },
     "error": {

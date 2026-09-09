@@ -18,8 +18,10 @@ from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClien
 from custom_components.baby_log_book.const import (
     CONF_CLAIM_LINK,
     CONF_HOUSEHOLD_ID,
+    CONF_HOUSEHOLD_NAME,
     CONF_MEMBER_ID,
     CONF_SESSION,
+    DEFAULT_HOUSEHOLD_NAME,
     DOMAIN,
 )
 
@@ -382,3 +384,41 @@ async def test_a_claim_that_answers_nonsense(
     looked = await paste(hass)
     done = await hass.config_entries.flow.async_configure(looked["flow_id"], {})
     assert done["errors"] == {"base": "not_baby_log_book"}
+
+
+async def test_a_nameless_link_confirms_in_its_own_words(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A Rescue Link previews without a name, so the *For:* line has to go.
+
+    The preview is deliberately thin and carries no Member, which is what keeps
+    an unauthenticated look from being a name oracle. One step id per wording,
+    because a translation cannot leave a line out.
+    """
+    mock_preview(aioclient_mock, kind="rescue", display_name=None)
+    mock_claim(aioclient_mock, kind="rescue")
+
+    looked = await paste(hass)
+    assert looked["step_id"] == "confirm_unnamed"
+    assert (looked["description_placeholders"] or {})["origin"] == ORIGIN
+
+    done = await hass.config_entries.flow.async_configure(looked["flow_id"], {})
+    assert done["type"] is FlowResultType.CREATE_ENTRY
+
+
+async def test_an_unnamed_household_still_names_the_entry(
+    hass: HomeAssistant, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """The app leaves the name optional; Home Assistant cannot."""
+    mock_preview(aioclient_mock)
+    mock_claim(
+        aioclient_mock,
+        household={"id": HOUSEHOLD_ID, "name": "", "day_start": "05:00", "zone": "Europe/Berlin"},
+    )
+
+    looked = await paste(hass)
+    done = await hass.config_entries.flow.async_configure(looked["flow_id"], {})
+    assert done["type"] is FlowResultType.CREATE_ENTRY
+    assert done["title"] == DEFAULT_HOUSEHOLD_NAME
+    # The blank the server sent is kept as it was; only what is shown falls back.
+    assert done["data"][CONF_HOUSEHOLD_NAME] == ""
