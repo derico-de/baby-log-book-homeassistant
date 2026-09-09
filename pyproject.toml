@@ -1,0 +1,83 @@
+# The integration is not a distributable package — Home Assistant loads
+# `custom_components/baby_log_book/` from a config directory and HACS copies it
+# there. This file exists for the toolchain: one `uv sync` installs the pinned
+# Home Assistant and the three tools CI runs, and every command is `uv run`.
+
+[project]
+name = "baby-log-book-homeassistant"
+version = "0.0.0"
+description = "The Home Assistant integration for Baby Log Book"
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+# pytest-homeassistant-custom-component ships the Home Assistant that demands
+# this floor; it is not a choice this repo makes.
+requires-python = ">=3.14.2"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    # ONE pinned Home Assistant, and it is the floor we claim: this release
+    # pins homeassistant==2026.8.3, which is what `hacs.json → homeassistant`
+    # says and what the dev-env container runs. Dependabot moves it weekly; the
+    # floor follows at release time, never before (spec §6.10).
+    "pytest-homeassistant-custom-component==0.13.357",
+    "ruff==0.16.6",
+    "mypy==2.3.1",
+]
+
+[tool.ruff]
+# Deliberately behind the interpreter we run. PEP 758 lets Python 3.14 write
+# `except A, B:` without parentheses, and the py314 formatter strips them — but
+# that form reads as a Python 2 syntax error to every older tool and to most
+# people, which is a legibility cost for nothing gained.
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle, pyflakes
+    "I",             # import order
+    "UP",            # pyupgrade
+    "B",             # bugbear
+    "SIM",           # simplify
+    "ASYNC",         # async antipatterns
+    "RUF",
+    "D",             # docstrings — Home Assistant's own house style
+]
+ignore = [
+    "D203",   # incompatible with D211
+    "D213",   # incompatible with D212
+    # This repo's prose says what a thing *is*, not what it *does* — the same
+    # register the specification and the server repo are written in. Imperative
+    # docstrings would make every comment in here read like a different voice.
+    "D401",
+    "RUF003", # a minus sign in a formula is a minus sign
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D100", "D103"]
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+# The tests import the integration as `custom_components.baby_log_book`, which
+# is how Home Assistant loads it; without these two mypy sees the same files
+# under two module names.
+explicit_package_bases = true
+namespace_packages = true
+mypy_path = "."
+# Not `warn_unreachable`: `DataUpdateCoordinator.data` is declared non-optional
+# although it is `None` until the first refresh, so every honest guard against
+# that would read as dead code.
+# Home Assistant ships its own inline types; the test plugin does not.
+[[tool.mypy.overrides]]
+module = "pytest_homeassistant_custom_component.*"
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["stream: let the live-stream background task actually run"]

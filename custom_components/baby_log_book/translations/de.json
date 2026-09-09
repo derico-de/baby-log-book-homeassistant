@@ -1,0 +1,221 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Einladungslink einfügen",
+        "description": "Ein Elternteil verschickt ihn aus der App: Einstellungen, dann eine Einladung für ein Hub. Den ganzen Link einfügen — er trägt die Adresse eurer Installation und den Token.",
+        "data": {
+          "claim_link": "Einladungslink"
+        },
+        "data_description": {
+          "claim_link": "Die ganze Adresse, genau wie sie angekommen ist."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Dieses Panel wurde abgemeldet",
+        "description": "Ein Elternteil erstellt in der App einen Anmeldelink — Einstellungen, neben den offenen Einladungen — für das Mitglied dieses Panels. Hier einfügen, genau wie bei einem verlorenen Telefon.",
+        "data": {
+          "claim_link": "Einladungslink"
+        },
+        "data_description": {
+          "claim_link": "Die ganze Adresse, genau wie sie angekommen ist."
+        }
+      },
+      "confirm": {
+        "title": "Diesen Link einlösen",
+        "description": "Server: {origin}\nFür: {name}\n\nDas Einlösen verbraucht den Link: er funktioniert nur einmal. Bisher ist nichts eingelöst."
+      }
+    },
+    "error": {
+      "link_expired": "Dieser Link ist abgelaufen. Ein Elternteil kann in den Einstellungen einen neuen erstellen.",
+      "link_used": "Dieser Link wurde bereits eingelöst. Wenn das nicht ihr wart, schaut in den Einstellungen bei den offenen Links nach.",
+      "link_burnt": "Dieser Link wurde zurückgezogen. Ein Elternteil kann in den Einstellungen einen neuen erstellen.",
+      "link_unknown": "Das ist kein Einladungslink.",
+      "cannot_connect": "Diese Adresse war nicht erreichbar.",
+      "not_baby_log_book": "Diese Adresse antwortet nicht wie ein Baby-Log-Book-Server.",
+      "http_public_origin": "Eine öffentliche Adresse muss HTTPS verwenden. Einfaches http:// ist nur im Heimnetz erlaubt.",
+      "hosting_paused": "Das Hosting dieses Haushalts ist pausiert. Ein Elternteil kann es fortsetzen, dann noch einmal versuchen.",
+      "server_too_old": "Diese Installation läuft mit Baby Log Book {server}. Dieses Panel braucht {minimum} oder neuer.",
+      "unknown": "Unerwarteter Fehler."
+    },
+    "abort": {
+      "already_configured": "Dieser Haushalt ist auf diesem Home Assistant schon eingerichtet. Ein zweites Wandpanel ist ein zweiter Home Assistant, kein zweiter Eintrag.",
+      "wrong_member": "Dieser Link war für {name}, nicht für das Mitglied dieses Panels. Er wurde verworfen. Bittet ein Elternteil um einen Anmeldelink für das Mitglied des Hubs.",
+      "reauth_successful": "Das Panel ist wieder angemeldet."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_feed": {
+        "name": "Letzte Mahlzeit"
+      },
+      "feed_due": {
+        "name": "Mahlzeit fällig"
+      },
+      "asleep_since": {
+        "name": "Schläft seit"
+      },
+      "awake_since": {
+        "name": "Wach seit"
+      },
+      "wake_window_up": {
+        "name": "Wachfenster vorbei"
+      },
+      "bottle_runs_out": {
+        "name": "Fläschchen läuft ab"
+      },
+      "last_poop": {
+        "name": "Letztes Kaka"
+      },
+      "feeds_today": {
+        "name": "Mahlzeiten heute"
+      },
+      "milk_today": {
+        "name": "Milch heute"
+      },
+      "sleep_today": {
+        "name": "Schlaf heute"
+      },
+      "tummy_today": {
+        "name": "Bauchzeit heute"
+      },
+      "pees_today": {
+        "name": "Pipi heute"
+      },
+      "poops_today": {
+        "name": "Kaka heute"
+      },
+      "last_update": {
+        "name": "Zuletzt aktualisiert"
+      },
+      "pending_writes": {
+        "name": "Ausstehende Schreibvorgänge"
+      }
+    },
+    "binary_sensor": {
+      "asleep": {
+        "name": "Schläft"
+      },
+      "feeding": {
+        "name": "Trinkt"
+      },
+      "bottle_open": {
+        "name": "Fläschchen offen"
+      },
+      "caregiving": {
+        "name": "Betreuung"
+      }
+    },
+    "button": {
+      "start_sleep": {
+        "name": "Schlaf"
+      },
+      "end_sleep": {
+        "name": "Sie ist wach"
+      },
+      "start_feed": {
+        "name": "Mahlzeit"
+      },
+      "end_feed": {
+        "name": "Mahlzeit beenden"
+      },
+      "start_tummy": {
+        "name": "Bauchzeit"
+      },
+      "end_tummy": {
+        "name": "Bauchzeit vorbei"
+      }
+    }
+  },
+  "selector": {
+    "contents": {
+      "options": {
+        "breast_milk": "Muttermilch",
+        "formula": "Pre-Nahrung",
+        "other": "Anderes"
+      }
+    },
+    "where": {
+      "options": {
+        "nappy": "Windel",
+        "potty": "Töpfchen",
+        "toilet": "Toilette"
+      }
+    },
+    "consistency": {
+      "options": {
+        "soft": "Weich",
+        "firm": "Fest",
+        "runny": "Flüssig",
+        "hard": "Hart"
+      }
+    }
+  },
+  "services": {
+    "log_bottle_feed": {
+      "name": "Flasche erfassen",
+      "description": "Erfasst eine Flasche für das Baby, dessen Gerät ausgewählt ist.",
+      "fields": {
+        "volume_ml": {
+          "name": "Menge",
+          "description": "Wie viel in die Flasche kam, in Millilitern."
+        },
+        "contents": {
+          "name": "Inhalt",
+          "description": "Was drin war."
+        },
+        "leftover_ml": {
+          "name": "Rest",
+          "description": "Was in der Flasche zurückkam, wenn die Mahlzeit schon vorbei ist. Die App selbst fragt das nicht mehr."
+        }
+      }
+    },
+    "log_nappy": {
+      "name": "Pipi & Kaka erfassen",
+      "description": "Erfasst Pipi, Kaka oder beides für das Baby, dessen Gerät ausgewählt ist — als ein Eintrag, denn es sind zwei Tatsachen über ein Ereignis.",
+      "fields": {
+        "pee": {
+          "name": "Pipi",
+          "description": "Ob es Pipi gab."
+        },
+        "poop": {
+          "name": "Kaka",
+          "description": "Ob es Kaka gab."
+        },
+        "where": {
+          "name": "Wohin",
+          "description": "Wo es gelandet ist."
+        },
+        "consistency": {
+          "name": "Konsistenz",
+          "description": "Nur zusammen mit Kaka sinnvoll."
+        }
+      }
+    }
+  },
+  "issues": {
+    "member_removed": {
+      "title": "Baby Log Book: dieses Panel wurde ausgesteckt",
+      "description": "Das Mitglied dieses Hubs wurde aus {household} entfernt, also liest und schreibt das Panel nicht mehr. Alles, was es erfasst hat, bleibt mit seinem Namen erhalten. Ein erneutes Anmelden gibt es nicht: das Entfernen verbrennt die Anmeldelinks. Zum Wiederverbinden schickt ein Elternteil eine neue Einladung für ein Hub, und ihr fügt Baby Log Book noch einmal hinzu."
+    },
+    "hosting_paused": {
+      "title": "Baby Log Book: Hosting pausiert",
+      "description": "Das Hosting von {household} ist pausiert, also zeigt das Panel lieber nichts als etwas Veraltetes. Ein Elternteil kann es fortsetzen; das Panel macht von selbst weiter."
+    },
+    "integration_outdated": {
+      "title": "Baby Log Book: Integration aktualisieren",
+      "description": "Der Server hat etwas geantwortet, das diese Version der Integration nicht lesen kann. Aktualisiert Baby Log Book in HACS. Dieser Stand spricht mit Servern ab {minimum}."
+    }
+  },
+  "exceptions": {
+    "outbox_full": {
+      "message": "Auf diesem Panel warten {limit} Eingaben noch darauf, den Server zu erreichen, deshalb wurde keine weitere angenommen. Es versucht es weiter; nichts Erfasstes geht verloren."
+    },
+    "not_a_baby": {
+      "message": "Dieses Gerät ist kein Baby ({device_id}). Bitte das Gerät des Babys auswählen."
+    },
+    "entry_not_loaded": {
+      "message": "Baby Log Book ist für dieses Gerät nicht geladen ({device_id})."
+    }
+  }
+}

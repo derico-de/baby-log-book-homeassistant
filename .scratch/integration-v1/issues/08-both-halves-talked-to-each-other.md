@@ -17,3 +17,19 @@ Deliberately **not** CI. The integration's own suite stays hermetic — no live 
 - [ ] Removing the Hub's Member stops the panel and raises the removed repair issue; the panel does **not** offer re-auth.
 - [ ] A Rescue Link minted from Settings re-binds the panel through the re-auth flow, and the phone stays signed in.
 - [ ] Findings recorded on this ticket. Anything the spec got wrong is corrected **in the spec**, not just in code.
+
+## Comments
+
+**Unblocked.** Every ticket in this repo is resolved, and so is every server-half
+ticket it named. The suite is hermetic and green (108 tests, 99 % coverage), ruff
+and mypy are clean, and the integration has never yet met a running deployment —
+which is exactly what this ticket is for.
+
+Two things to look at first, because they are the parts the mocked suite cannot
+prove and the build changed:
+
+- **The three `*_entry_id` fields**, added to `GET /api/hub/state` for this build
+  (spec §5.5). Start a Sleep on a phone and press *she's awake* on the panel.
+- **The version block on the claim preview**, added so the config flow can gate on
+  the server's release before the link is spent (spec §6.2). Point the flow at a
+  deployment and check the form error names both numbers.

@@ -1,0 +1,221 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Lipește un link de acces",
+        "description": "Un părinte îl trimite din aplicație: Setări, apoi o invitație pentru un Hub. Lipește linkul întreg — el poartă adresa instalării voastre și tokenul.",
+        "data": {
+          "claim_link": "Link de acces"
+        },
+        "data_description": {
+          "claim_link": "Adresa întreagă, exact cum a sosit."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Acest panou a fost deconectat",
+        "description": "Un părinte creează în aplicație un link de reconectare — Setări, lângă invitațiile în așteptare — pentru membrul acestui panou. Lipește-l aici, la fel ca la un telefon pierdut.",
+        "data": {
+          "claim_link": "Link de acces"
+        },
+        "data_description": {
+          "claim_link": "Adresa întreagă, exact cum a sosit."
+        }
+      },
+      "confirm": {
+        "title": "Folosește acest link",
+        "description": "Server: {origin}\nPentru: {name}\n\nFolosirea consumă linkul: un link de acces funcționează o singură dată. Deocamdată nu s-a folosit nimic."
+      }
+    },
+    "error": {
+      "link_expired": "Linkul a expirat. Un părinte poate crea unul nou în Setări.",
+      "link_used": "Linkul a fost deja folosit. Dacă nu ai fost tu, verifică linkurile în așteptare din Setări.",
+      "link_burnt": "Linkul a fost retras. Un părinte poate crea unul nou în Setări.",
+      "link_unknown": "Acesta nu este un link de acces.",
+      "cannot_connect": "Nu s-a putut ajunge la adresa aceea.",
+      "not_baby_log_book": "Adresa aceea nu răspunde ca un server Baby Log Book.",
+      "http_public_origin": "O adresă publică trebuie să folosească HTTPS. Simplul http:// este permis doar într-o rețea de acasă.",
+      "hosting_paused": "Găzduirea acestei gospodării este suspendată. Un părinte o poate relua, apoi mai încearcă o dată.",
+      "server_too_old": "Instalarea aceea rulează Baby Log Book {server}. Panoul are nevoie de {minimum} sau mai nou.",
+      "unknown": "Eroare neașteptată."
+    },
+    "abort": {
+      "already_configured": "Gospodăria este deja configurată pe acest Home Assistant. Un al doilea panou de perete înseamnă un al doilea Home Assistant, nu o a doua intrare.",
+      "wrong_member": "Linkul acela era pentru {name}, nu pentru membrul acestui panou. A fost aruncat. Cere-i unui părinte un link de reconectare pentru membrul Hubului.",
+      "reauth_successful": "Panoul este conectat din nou."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_feed": {
+        "name": "Ultima masă"
+      },
+      "feed_due": {
+        "name": "Masa următoare"
+      },
+      "asleep_since": {
+        "name": "Doarme de la"
+      },
+      "awake_since": {
+        "name": "Trează de la"
+      },
+      "wake_window_up": {
+        "name": "Fereastra de veghe expiră"
+      },
+      "bottle_runs_out": {
+        "name": "Biberonul expiră"
+      },
+      "last_poop": {
+        "name": "Ultimul caca"
+      },
+      "feeds_today": {
+        "name": "Mese azi"
+      },
+      "milk_today": {
+        "name": "Lapte azi"
+      },
+      "sleep_today": {
+        "name": "Somn azi"
+      },
+      "tummy_today": {
+        "name": "Timp pe burtică azi"
+      },
+      "pees_today": {
+        "name": "Pipi azi"
+      },
+      "poops_today": {
+        "name": "Caca azi"
+      },
+      "last_update": {
+        "name": "Ultima actualizare"
+      },
+      "pending_writes": {
+        "name": "Scrieri în așteptare"
+      }
+    },
+    "binary_sensor": {
+      "asleep": {
+        "name": "Doarme"
+      },
+      "feeding": {
+        "name": "Mănâncă"
+      },
+      "bottle_open": {
+        "name": "Biberon deschis"
+      },
+      "caregiving": {
+        "name": "Îngrijirea"
+      }
+    },
+    "button": {
+      "start_sleep": {
+        "name": "Somn"
+      },
+      "end_sleep": {
+        "name": "S-a trezit"
+      },
+      "start_feed": {
+        "name": "Masă"
+      },
+      "end_feed": {
+        "name": "Încheie masa"
+      },
+      "start_tummy": {
+        "name": "Timp pe burtică"
+      },
+      "end_tummy": {
+        "name": "Gata cu burtica"
+      }
+    }
+  },
+  "selector": {
+    "contents": {
+      "options": {
+        "breast_milk": "Lapte de mamă",
+        "formula": "Formulă",
+        "other": "Altceva"
+      }
+    },
+    "where": {
+      "options": {
+        "nappy": "Scutec",
+        "potty": "Oliță",
+        "toilet": "Toaletă"
+      }
+    },
+    "consistency": {
+      "options": {
+        "soft": "Moale",
+        "firm": "Consistentă",
+        "runny": "Apoasă",
+        "hard": "Tare"
+      }
+    }
+  },
+  "services": {
+    "log_bottle_feed": {
+      "name": "Înregistrează un biberon",
+      "description": "Înregistrează un biberon pentru bebelușul al cărui dispozitiv îl alegi.",
+      "fields": {
+        "volume_ml": {
+          "name": "Cantitate",
+          "description": "Cât a intrat în biberon, în mililitri."
+        },
+        "contents": {
+          "name": "Conținut",
+          "description": "Ce a fost în el."
+        },
+        "leftover_ml": {
+          "name": "Rest",
+          "description": "Ce a rămas în biberon, dacă masa s-a încheiat deja. Aplicația nu mai cere acest lucru."
+        }
+      }
+    },
+    "log_nappy": {
+      "name": "Înregistrează pipi & caca",
+      "description": "Înregistrează pipi, caca sau amândouă pentru bebelușul al cărui dispozitiv îl alegi — o singură înregistrare, pentru că sunt două fapte despre un singur eveniment.",
+      "fields": {
+        "pee": {
+          "name": "Pipi",
+          "description": "Dacă a fost pipi."
+        },
+        "poop": {
+          "name": "Caca",
+          "description": "Dacă a fost caca."
+        },
+        "where": {
+          "name": "Unde",
+          "description": "Unde a ajuns."
+        },
+        "consistency": {
+          "name": "Consistență",
+          "description": "Are sens doar împreună cu caca."
+        }
+      }
+    }
+  },
+  "issues": {
+    "member_removed": {
+      "title": "Baby Log Book: panoul a fost scos din priză",
+      "description": "Membrul acestui Hub a fost eliminat din {household}, așa că panoul nu mai citește și nu mai scrie. Tot ce a înregistrat rămâne cu numele lui. Nu există reconectare: eliminarea arde linkurile de reconectare. Pentru a reconecta, un părinte trimite o invitație nouă pentru un Hub și adăugați Baby Log Book din nou."
+    },
+    "hosting_paused": {
+      "title": "Baby Log Book: găzduirea este suspendată",
+      "description": "Găzduirea pentru {household} este suspendată, așa că panoul nu arată nimic în loc să arate ceva învechit. Un părinte o poate relua; panoul își reia singur activitatea."
+    },
+    "integration_outdated": {
+      "title": "Baby Log Book: actualizează integrarea",
+      "description": "Serverul a spus ceva ce această versiune a integrării nu poate citi. Actualizează Baby Log Book în HACS. Această versiune vorbește cu servere de la {minimum} în sus."
+    }
+  },
+  "exceptions": {
+    "outbox_full": {
+      "message": "Pe acest panou {limit} apăsări încă așteaptă să ajungă la server, așa că nu a mai fost primită încă una. Încearcă în continuare; nimic din ce este în așteptare nu se pierde."
+    },
+    "not_a_baby": {
+      "message": "Dispozitivul acela nu este un bebeluș ({device_id}). Alege dispozitivul bebelușului."
+    },
+    "entry_not_loaded": {
+      "message": "Baby Log Book nu este încărcat pentru dispozitivul acela ({device_id})."
+    }
+  }
+}

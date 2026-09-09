@@ -1,0 +1,64 @@
+# Three hard gates, in the server repo's house style rather than the
+# integration blueprint's four-file split.
+#
+# The weekly cron is not decoration: Home Assistant releases monthly, and the
+# thing that breaks a custom integration usually arrives without a dependency
+# bump of ours. A red run here on a Monday morning is the alarm.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Mondays, early. Nothing is racing it.
+    - cron: '17 5 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      # Strict, over the code that ships and the tests that hold it.
+      - run: uv run mypy custom_components tests
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      # No live Home Assistant instance, ever: the aiohttp calls are mocked and
+      # the Home Assistant side is real. The dev-env container in the server
+      # repo has no part in this.
+      - run: uv run pytest --cov=custom_components/baby_log_book --cov-fail-under=95
+
+  # What pytest never reads: the three translation files, services.yaml against
+  # the registered actions, icons.json, and the manifest keys HACS demands.
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: hassfest
+        uses: home-assistant/actions/hassfest@master
+      - name: HACS
+        uses: hacs/action@main
+        with:
+          category: integration
+          # DATED DEBT, not a permanent config line: the brands PR is item 1 on
+          # the pre-1.0.0 checklist in the specification. Open
+          # home-assistant/brands, then delete this line.
+          ignore: brands

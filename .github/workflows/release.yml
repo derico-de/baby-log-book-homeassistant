@@ -1,0 +1,48 @@
+# manifest = tag = release, enforced and never stamped.
+#
+# The blueprint rewrites the manifest version from the tag at release time,
+# which leaves the version in the tree meaningless for anybody installing from
+# the default branch. Here the human bumps the manifest in the release commit
+# and this refuses a tag that disagrees. The tree stays honest.
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: The manifest and the tag must agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          manifest=$(python3 -c "import json;print(json.load(open('custom_components/baby_log_book/manifest.json'))['version'])")
+          if [ "$tag" != "$manifest" ]; then
+            echo "::error::tag $GITHUB_REF_NAME says $tag, manifest.json says $manifest"
+            exit 1
+          fi
+
+      # HACS shows the GitHub release body to anybody considering the update,
+      # so it is the one place a stranger reads what changed. Deriving it from
+      # CHANGELOG.md means the two cannot drift.
+      - name: The release notes are that version's changelog section
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          awk -v v="## [$tag]" '
+            index($0, v) == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for $tag"
+            exit 1
+          fi
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: notes.md

@@ -1,0 +1,77 @@
+# The two actions that take arguments. Names, descriptions and field labels are
+# NOT here — they live in translations/, so the wall speaks the same three
+# languages the app does.
+#
+# Neither schema has a baby_id field, and neither ever will: a call names the
+# Baby's device and the integration resolves it.
+
+log_bottle_feed:
+  target:
+    device:
+      integration: baby_log_book
+  fields:
+    volume_ml:
+      required: true
+      example: 120
+      selector:
+        number:
+          min: 1
+          max: 2000
+          step: 5
+          unit_of_measurement: mL
+          mode: box
+    contents:
+      required: false
+      example: formula
+      selector:
+        select:
+          translation_key: contents
+          options:
+            - breast_milk
+            - formula
+            - other
+    leftover_ml:
+      required: false
+      example: 30
+      selector:
+        number:
+          min: 0
+          max: 2000
+          step: 5
+          unit_of_measurement: mL
+          mode: box
+
+log_nappy:
+  target:
+    device:
+      integration: baby_log_book
+  fields:
+    pee:
+      required: true
+      selector:
+        boolean:
+    poop:
+      required: true
+      selector:
+        boolean:
+    where:
+      required: false
+      example: nappy
+      selector:
+        select:
+          translation_key: where
+          options:
+            - nappy
+            - potty
+            - toilet
+    consistency:
+      required: false
+      example: soft
+      selector:
+        select:
+          translation_key: consistency
+          options:
+            - soft
+            - firm
+            - runny
+            - hard

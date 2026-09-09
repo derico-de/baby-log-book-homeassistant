@@ -1,0 +1,221 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Paste a Claim Link",
+        "description": "A Parent sends one from the app: Settings, then an Invite for a Hub. Paste the whole link — it carries the address of your deployment and the token.",
+        "data": {
+          "claim_link": "Claim Link"
+        },
+        "data_description": {
+          "claim_link": "The whole URL, exactly as it arrived."
+        }
+      },
+      "reauth_confirm": {
+        "title": "This panel has been signed out",
+        "description": "A Parent mints a Rescue Link in the app — Settings, beside the pending invites — for this panel's Member. Paste it here, the same way a lost phone is signed back in.",
+        "data": {
+          "claim_link": "Claim Link"
+        },
+        "data_description": {
+          "claim_link": "The whole URL, exactly as it arrived."
+        }
+      },
+      "confirm": {
+        "title": "Claim this link",
+        "description": "Server: {origin}\nFor: {name}\n\nClaiming spends the link: a Claim Link works only once. Nothing has been claimed yet."
+      }
+    },
+    "error": {
+      "link_expired": "That link has expired. A Parent can mint a fresh one in Settings.",
+      "link_used": "That link has already been claimed. If that was not you, check the pending links in Settings.",
+      "link_burnt": "That link has been revoked. A Parent can mint a fresh one in Settings.",
+      "link_unknown": "That is not a Claim Link.",
+      "cannot_connect": "Could not reach that address.",
+      "not_baby_log_book": "That address does not answer like a Baby Log Book server.",
+      "http_public_origin": "A public address must use HTTPS. Plain http:// is only allowed on a home network.",
+      "hosting_paused": "Hosting is paused for that Household. A Parent can resume it, then try again.",
+      "server_too_old": "That deployment runs Baby Log Book {server}. This panel needs {minimum} or newer.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This Household is already on this Home Assistant. A second wall panel is a second Home Assistant, not a second entry.",
+      "wrong_member": "That link was for {name}, not for this panel's Member. It has been discarded. Ask a Parent for a Rescue Link for the Hub's Member.",
+      "reauth_successful": "The panel is signed back in."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "last_feed": {
+        "name": "Last feed"
+      },
+      "feed_due": {
+        "name": "Feed due"
+      },
+      "asleep_since": {
+        "name": "Asleep since"
+      },
+      "awake_since": {
+        "name": "Awake since"
+      },
+      "wake_window_up": {
+        "name": "Wake window up"
+      },
+      "bottle_runs_out": {
+        "name": "Bottle life runs out"
+      },
+      "last_poop": {
+        "name": "Last poop"
+      },
+      "feeds_today": {
+        "name": "Feeds today"
+      },
+      "milk_today": {
+        "name": "Milk today"
+      },
+      "sleep_today": {
+        "name": "Sleep today"
+      },
+      "tummy_today": {
+        "name": "Tummy time today"
+      },
+      "pees_today": {
+        "name": "Pees today"
+      },
+      "poops_today": {
+        "name": "Poops today"
+      },
+      "last_update": {
+        "name": "Last update"
+      },
+      "pending_writes": {
+        "name": "Pending writes"
+      }
+    },
+    "binary_sensor": {
+      "asleep": {
+        "name": "Asleep"
+      },
+      "feeding": {
+        "name": "Feeding"
+      },
+      "bottle_open": {
+        "name": "Bottle open"
+      },
+      "caregiving": {
+        "name": "Caregiving"
+      }
+    },
+    "button": {
+      "start_sleep": {
+        "name": "Sleep"
+      },
+      "end_sleep": {
+        "name": "She's awake"
+      },
+      "start_feed": {
+        "name": "Feed"
+      },
+      "end_feed": {
+        "name": "End feed"
+      },
+      "start_tummy": {
+        "name": "Tummy time"
+      },
+      "end_tummy": {
+        "name": "Off her tummy"
+      }
+    }
+  },
+  "selector": {
+    "contents": {
+      "options": {
+        "breast_milk": "Breast milk",
+        "formula": "Formula",
+        "other": "Other"
+      }
+    },
+    "where": {
+      "options": {
+        "nappy": "Nappy",
+        "potty": "Potty",
+        "toilet": "Toilet"
+      }
+    },
+    "consistency": {
+      "options": {
+        "soft": "Soft",
+        "firm": "Firm",
+        "runny": "Runny",
+        "hard": "Hard"
+      }
+    }
+  },
+  "services": {
+    "log_bottle_feed": {
+      "name": "Log a bottle feed",
+      "description": "Logs a bottle for the Baby whose device you target.",
+      "fields": {
+        "volume_ml": {
+          "name": "Volume",
+          "description": "How much went into the bottle, in millilitres."
+        },
+        "contents": {
+          "name": "Contents",
+          "description": "What was in it."
+        },
+        "leftover_ml": {
+          "name": "Leftover",
+          "description": "What came back in the bottle, if the feed is already over. The app's own sheet no longer asks for this."
+        }
+      }
+    },
+    "log_nappy": {
+      "name": "Log pee & poop",
+      "description": "Logs a pee, a poop or both for the Baby whose device you target — one entry, because they are two facts about one event.",
+      "fields": {
+        "pee": {
+          "name": "Pee",
+          "description": "Whether there was a pee."
+        },
+        "poop": {
+          "name": "Poop",
+          "description": "Whether there was a poop."
+        },
+        "where": {
+          "name": "Where",
+          "description": "Where it landed."
+        },
+        "consistency": {
+          "name": "Consistency",
+          "description": "Only meaningful with a poop."
+        }
+      }
+    }
+  },
+  "issues": {
+    "member_removed": {
+      "title": "Baby Log Book: this panel has been unplugged",
+      "description": "The Hub's Member has been removed from {household}, so this panel has stopped reading and writing. Everything it logged stays with its name on it. There is no signing back in: removal burns the Rescue Links. To reconnect, a Parent sends a fresh Invite for a Hub and you add Baby Log Book again."
+    },
+    "hosting_paused": {
+      "title": "Baby Log Book: hosting is paused",
+      "description": "Hosting for {household} is paused, so the panel is showing nothing rather than something stale. A Parent can resume it; the panel picks up again on its own."
+    },
+    "integration_outdated": {
+      "title": "Baby Log Book: update the integration",
+      "description": "The server said something this version of the integration cannot read. Update Baby Log Book in HACS. This build speaks to servers from {minimum} upwards."
+    }
+  },
+  "exceptions": {
+    "outbox_full": {
+      "message": "This panel has {limit} presses still waiting to reach the server, so it did not take another one. It keeps trying; nothing queued is lost."
+    },
+    "not_a_baby": {
+      "message": "That device is not a Baby ({device_id}). Target the Baby's device."
+    },
+    "entry_not_loaded": {
+      "message": "Baby Log Book is not loaded for that device ({device_id})."
+    }
+  }
+}

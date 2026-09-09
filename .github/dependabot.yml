@@ -1,0 +1,16 @@
+# Weekly, on both ecosystems. A red Dependabot PR *is* the alarm that Home
+# Assistant broke us — which is why the pinned
+# pytest-homeassistant-custom-component is a hard pin and not a range.
+#
+# The declared floor in hacs.json follows this pin at release time, never at
+# the bump: never claim a floor you do not test.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

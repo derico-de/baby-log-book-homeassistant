@@ -1,0 +1,39 @@
+{
+  "entity": {
+    "sensor": {
+      "last_feed": { "default": "mdi:baby-bottle-outline" },
+      "feed_due": { "default": "mdi:clock-alert-outline" },
+      "asleep_since": { "default": "mdi:sleep" },
+      "awake_since": { "default": "mdi:sleep-off" },
+      "wake_window_up": { "default": "mdi:timer-sand-complete" },
+      "bottle_runs_out": { "default": "mdi:timer-sand" },
+      "last_poop": { "default": "mdi:emoticon-poop" },
+      "feeds_today": { "default": "mdi:baby-bottle" },
+      "milk_today": { "default": "mdi:cup-water" },
+      "sleep_today": { "default": "mdi:power-sleep" },
+      "tummy_today": { "default": "mdi:baby-face-outline" },
+      "pees_today": { "default": "mdi:water" },
+      "poops_today": { "default": "mdi:emoticon-poop" },
+      "last_update": { "default": "mdi:cloud-check-outline" },
+      "pending_writes": { "default": "mdi:tray-full" }
+    },
+    "binary_sensor": {
+      "asleep": { "default": "mdi:sleep-off", "state": { "on": "mdi:sleep" } },
+      "feeding": { "default": "mdi:baby-bottle-outline", "state": { "on": "mdi:baby-bottle" } },
+      "bottle_open": { "default": "mdi:bottle-tonic-outline", "state": { "on": "mdi:bottle-tonic" } },
+      "caregiving": { "default": "mdi:account-off-outline", "state": { "on": "mdi:account-heart" } }
+    },
+    "button": {
+      "start_sleep": { "default": "mdi:sleep" },
+      "end_sleep": { "default": "mdi:weather-sunny" },
+      "start_feed": { "default": "mdi:mother-nurse" },
+      "end_feed": { "default": "mdi:stop-circle-outline" },
+      "start_tummy": { "default": "mdi:baby-face-outline" },
+      "end_tummy": { "default": "mdi:stop-circle-outline" }
+    }
+  },
+  "services": {
+    "log_bottle_feed": { "service": "mdi:baby-bottle" },
+    "log_nappy": { "service": "mdi:emoticon-poop" }
+  }
+}
