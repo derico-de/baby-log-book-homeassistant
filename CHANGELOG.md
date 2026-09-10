@@ -14,6 +14,8 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-10
+
 ### Fixed
 
 - The server floor is `1.26.0`, the release that actually carries the wire this
