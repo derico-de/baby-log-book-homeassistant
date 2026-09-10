@@ -91,6 +91,12 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ### Fixed
 
+- `LICENSE` carries the licence. It held a maintainer's note where the verbatim
+  GNU AGPL-3.0 text belongs — written on a machine that had no copy of it and no
+  way to fetch one — and AGPL §14 wants the real thing before the program is
+  conveyed to anybody. A release is exactly that moment.
+
+
 - A Household that has never been named arrives with a name anyway. Naming one
   is optional in the app, and nothing in the app displays it, so plenty of them
   never get one — but Home Assistant writes it on the entry, on a device and
