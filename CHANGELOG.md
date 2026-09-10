@@ -12,7 +12,7 @@ update.
 Versions are independent of the server's, from `1.0.0`. `manifest.json →
 version` = the git tag = the GitHub release, bumped together in one commit.
 
-## [Unreleased]
+## [1.0.0] - 2026-09-10
 
 ### Added
 

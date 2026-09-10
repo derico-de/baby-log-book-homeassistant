@@ -188,7 +188,7 @@ Each release names the oldest server and the oldest Home Assistant it works with
 
 | Integration | Needs Baby Log Book | Needs Home Assistant |
 | --- | --- | --- |
-| _unreleased_ | ≥ 1.25.0 | ≥ 2026.8.3 |
+| 1.0.0 | ≥ 1.25.0 | ≥ 2026.8.3 |
 
 ## Development
 
