@@ -27,6 +27,8 @@ A parent opens the app's **Settings**, sends an **Invite**, and ticks *this one 
 for a Hub* — which fixes the role at caregiver, because a credential sitting on a
 box in the hall should not be able to manage the Household.
 
+![The app's Settings: an Invite named Home Assistant, with "This is for a Hub" ticked and the role locked at caregiver](docs/invite-for-a-hub.png)
+
 Paste the whole link into the one field the config flow asks for. It looks the
 link up first and shows you what it found; nothing is spent until you confirm.
 

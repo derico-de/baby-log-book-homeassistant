@@ -86,7 +86,8 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 - The README a stranger follows: what this is, installing it, claiming a link,
   revoking it, signing back in, a dashboard card, two automations to copy, a
   one-press bottle script, what it deliberately does not do, and the
-  compatibility table.
+  compatibility table — with a screenshot of the one step that is done in the
+  app rather than in Home Assistant, ticking *this is for a Hub* on the invite.
 
 ### Fixed
 
