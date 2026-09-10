@@ -15,7 +15,7 @@ DOMAIN: Final = "baby_log_book"
 #: The oldest Baby Log Book this release speaks to. Raised only by a release
 #: whose code needs something newer, and only after that something has shipped
 #: server-side (ADR-0039).
-MIN_SERVER_VERSION: Final = "1.25.0"
+MIN_SERVER_VERSION: Final = "1.26.0"
 
 #: The session cookie the server sets on a claim. Named here because the
 #: integration holds the value itself rather than letting a cookie jar do it:

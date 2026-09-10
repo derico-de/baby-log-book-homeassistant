@@ -188,7 +188,13 @@ Each release names the oldest server and the oldest Home Assistant it works with
 
 | Integration | Needs Baby Log Book | Needs Home Assistant |
 | --- | --- | --- |
-| 1.0.0 | ≥ 1.25.0 | ≥ 2026.8.3 |
+| 1.0.1 | ≥ 1.26.0 | ≥ 2026.8.3 |
+| 1.0.0 | ≥ 1.26.0 | ≥ 2026.8.3 |
+
+`1.0.0`'s own gate says `1.25.0`, and that number was never true: `GET
+/api/hub/state`, the one read this panel makes, first shipped in **1.26.0**. On
+a 1.25.0 deployment 1.0.0 accepts the Claim Link, spends it, and then finds
+nothing to read. `1.0.1` states the floor it always had.
 
 ## Development
 

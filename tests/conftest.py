@@ -32,7 +32,7 @@ from custom_components.baby_log_book.const import (
 ORIGIN = "https://babylog.example"
 HOUSEHOLD_ID = "h1"
 BABY_ID = "b1"
-SERVER_VERSION = "1.25.0"
+SERVER_VERSION = "1.26.0"
 ETAG = '"7-2026-08-17-0"'
 
 NOW_MS = 1_724_800_000_000

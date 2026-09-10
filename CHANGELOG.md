@@ -12,6 +12,21 @@ update.
 Versions are independent of the server's, from `1.0.0`. `manifest.json →
 version` = the git tag = the GitHub release, bumped together in one commit.
 
+## [Unreleased]
+
+### Fixed
+
+- The server floor is `1.26.0`, the release that actually carries the wire this
+  panel reads. `MIN_SERVER_VERSION` said `1.25.0` and no 1.25.0 deployment has
+  ever had `GET /api/hub/state` — it shipped in 1.26.0, together with the Hub's
+  Member kind, the version a claim link reports before it is spent, and the
+  running sessions the three end-buttons need. The old number let a 1.25.0
+  server through setup, spent the one-shot Claim Link on it and then found
+  nothing to read; the version gate now refuses it while the link is still
+  good, which is the whole point of reading the version first (ADR-0039). The
+  compatibility table in the README names the corrected floor for both
+  releases.
+
 ## [1.0.0] - 2026-09-10
 
 ### Added
