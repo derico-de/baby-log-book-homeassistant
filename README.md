@@ -174,6 +174,52 @@ never fires a ten-minutes-early trigger — that moment has passed — and a cle
 Target, where the sensor reads *unknown*, arms nothing until a real instant
 comes back.
 
+## A quiet announcement
+
+`tts.speak` plays at whatever the speaker is already set to, which at three in
+the morning is whatever the last person listening to music left it at. That is
+Home Assistant's business rather than ours, but it is the first thing a family
+hits, so:
+
+```yaml
+actions:
+  - variables:
+      previous: "{{ state_attr('media_player.hall', 'volume_level') }}"
+  - action: media_player.volume_set
+    target: { entity_id: media_player.hall }
+    data:
+      volume_level: >
+        {{ 0.15 if today_at('22:00') <= now() or now() < today_at('07:00')
+           else 0.35 }}
+  - action: tts.speak
+    target: { entity_id: tts.piper }
+    data:
+      media_player_entity_id: media_player.hall
+      message: "Emma is due a feed."
+  - wait_for_trigger:
+      - trigger: state
+        entity_id: media_player.hall
+        to: "idle"
+    timeout: "00:00:30"
+  - action: media_player.volume_set
+    target: { entity_id: media_player.hall }
+    data:
+      volume_level: "{{ previous | default(0.35) }}"
+```
+
+Two things bite here. `tts.speak` returns as soon as it has queued the speech,
+not when the speaker has finished saying it — restore the volume without that
+wait and the announcement is cut off mid-word. And `previous` is nothing at all
+if the speaker was off, hence the default.
+
+A Sonos makes the whole dance unnecessary: `sonos.snapshot` and `sonos.restore`
+take the volume *and* whatever was playing, in one action each. A Google or Nest
+speaker accepts `announce: true` on `media_player.play_media`, which ducks the
+music instead of stopping it — but it announces at its own fixed level, which is
+louder rather than quieter. In a house with a sleeping baby the calmest answer
+is often not one speaker argued with but a second, quieter one, picked by the
+hour.
+
 ## A one-press bottle button
 
 A bottle takes an amount, so it is an action rather than a button — which is

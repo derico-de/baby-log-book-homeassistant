@@ -23,6 +23,12 @@ version` = the git tag = the GitHub release, bumped together in one commit.
   section now names the difference, shows `offset` on `feed_due` in both
   directions rather than only on `bottle_life_runs_out`, and states when the
   timer is armed: on every change, and only while the instant is still ahead.
+- A README section on announcing quietly. `tts.speak` plays at whatever the
+  speaker was left at, and a feed announcement lands at three in the morning:
+  set the volume by the hour, wait for the speaker to go idle — `tts.speak`
+  returns when the speech is queued, not when it has been said — and put the
+  volume back. With the Sonos snapshot pair and the Google `announce` caveat
+  beside it.
 
 ## [1.0.1] - 2026-09-10
 
