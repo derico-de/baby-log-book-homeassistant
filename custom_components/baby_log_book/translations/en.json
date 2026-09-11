@@ -94,6 +94,18 @@
       },
       "pending_writes": {
         "name": "Pending writes"
+      },
+      "day_start": {
+        "name": "Day start"
+      },
+      "night_start": {
+        "name": "Night start"
+      },
+      "feed_notice_s": {
+        "name": "Feed reminder"
+      },
+      "sleep_notice_s": {
+        "name": "Sleep reminder"
       }
     },
     "binary_sensor": {

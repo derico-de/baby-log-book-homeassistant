@@ -78,9 +78,24 @@ reset at the Household's own day start rather than at midnight, so an 05:00
 household gets an 05:00 day. Milk and tummy time appear the first time either is
 ever logged, and never go away again.
 
-On the Household device: `binary_sensor.<household>_caregiving`, and two
+On the Household device: `binary_sensor.<household>_caregiving`, two
 diagnostics — when the panel last heard the server, and how many presses are
-still queued. Naming the Household is optional in the app, and one that has not
+still queued — and the four settings the app states about this Household's day.
+
+| Entity | Reads |
+| --- | --- |
+| `sensor.<household>_day_start` | the stated Day Start, `HH:MM` |
+| `sensor.<household>_night_start` | when the night begins, `HH:MM`, or unknown where the Household keeps none |
+| `sensor.<household>_feed_reminder` | seconds *before* a feed is due that the app sends its own reminder |
+| `sensor.<household>_sleep_reminder` | seconds *after* the wake window is up that it sends the other one |
+
+Those four exist so an hour is stated **once**. A night window typed again in
+Home Assistant is a second place to keep it in step, and the two drift; the app
+is where a family already sets its day, so read it from there. They are
+diagnostic entities — usable in any automation, out of the way on a dashboard —
+and they go unavailable with the rest when the panel loses the server, because a
+stale Day Start would be quiet at the wrong hour and never say why. No reminder
+crosses the wire and none ever will: these are the numbers behind one. Naming the Household is optional in the app, and one that has not
 been named is called **Baby Log Book** here, because Home Assistant has to write
 something on the device.
 
@@ -264,6 +279,7 @@ Each release names the oldest server and the oldest Home Assistant it works with
 
 | Integration | Needs Baby Log Book | Needs Home Assistant |
 | --- | --- | --- |
+| 1.1.0 | ≥ 1.28.0 | ≥ 2026.8.3 |
 | 1.0.1 | ≥ 1.26.0 | ≥ 2026.8.3 |
 | 1.0.0 | ≥ 1.26.0 | ≥ 2026.8.3 |
 

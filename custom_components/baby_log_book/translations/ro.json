@@ -94,6 +94,18 @@
       },
       "pending_writes": {
         "name": "Scrieri în așteptare"
+      },
+      "day_start": {
+        "name": "Începutul zilei"
+      },
+      "night_start": {
+        "name": "Începutul nopții"
+      },
+      "feed_notice_s": {
+        "name": "Memento masă"
+      },
+      "sleep_notice_s": {
+        "name": "Memento somn"
       }
     },
     "binary_sensor": {

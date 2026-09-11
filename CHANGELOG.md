@@ -16,6 +16,27 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ### Added
 
+- The Household device carries the four settings the app states about this
+  Household's day: `day_start`, `night_start`, `feed_reminder` and
+  `sleep_reminder`. A family that wants the wall quieter at night had no way to
+  ask Home Assistant when this Household's night is — `day_reset_at` is an
+  instant, and a night window's end is an hour that has to hold tomorrow too —
+  and one that had already set a reminder offset in the app was being asked for
+  it a second time here. An hour stated twice is two places to keep in step.
+
+  `night_start` is the Night **in force**, so a Household that keeps none reads
+  unknown rather than repeating its Day Start. All four are diagnostic
+  entities — usable in any automation, out of the way on a dashboard — and,
+  unlike the two staleness tells, they go unavailable with the coordinator: a
+  stale Day Start would be quiet at the wrong hour and never say why.
+
+### Changed
+
+- The server floor is `1.28.0`, the release that carries those four fields on
+  `GET /api/hub/state`.
+
+### Added
+
 - The README's automation section says which trigger to use. A timestamp sensor
   accepts a *state* trigger as readily as a *time* one, and the state trigger
   fires when a feed is logged rather than when the next one comes due — the

@@ -15,7 +15,7 @@ DOMAIN: Final = "baby_log_book"
 #: The oldest Baby Log Book this release speaks to. Raised only by a release
 #: whose code needs something newer, and only after that something has shipped
 #: server-side (ADR-0039).
-MIN_SERVER_VERSION: Final = "1.26.0"
+MIN_SERVER_VERSION: Final = "1.28.0"
 
 #: The session cookie the server sets on a claim. Named here because the
 #: integration holds the value itself rather than letting a cookie jar do it:
@@ -105,6 +105,14 @@ TOTAL_KEYS: Final = ("feeds_today", "sleep_today", "pees_today", "poops_today")
 #: Absent from the payload until the Household has **ever** logged one, created
 #: on the first that arrives, and never removed again. The rule only adds.
 FIRST_USE_TOTAL_KEYS: Final = ("milk_today", "tummy_today")
+
+#: What the app states about this Household's day, mirrored so an automation can
+#: default to it instead of asking a family to type the same hour twice. Two
+#: hours as `HH:MM` — `night_start` is the Night **in force**, so a Household
+#: that keeps none sends `null` — and the two Notice offsets in seconds. No
+#: reminder rides this wire; these are the numbers behind one.
+HOUSEHOLD_HOUR_KEYS: Final = ("day_start", "night_start")
+HOUSEHOLD_NOTICE_KEYS: Final = ("feed_notice_s", "sleep_notice_s")
 
 #: The Household device's own two, and its diagnostics. Neither has a payload
 #: field behind it: they are what the coordinator knows about itself.

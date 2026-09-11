@@ -15,7 +15,11 @@
       "pees_today": { "default": "mdi:water" },
       "poops_today": { "default": "mdi:emoticon-poop" },
       "last_update": { "default": "mdi:cloud-check-outline" },
-      "pending_writes": { "default": "mdi:tray-full" }
+      "pending_writes": { "default": "mdi:tray-full" },
+      "day_start": { "default": "mdi:weather-sunset-up" },
+      "night_start": { "default": "mdi:weather-night" },
+      "feed_notice_s": { "default": "mdi:bell-ring-outline" },
+      "sleep_notice_s": { "default": "mdi:bell-sleep-outline" }
     },
     "binary_sensor": {
       "asleep": { "default": "mdi:sleep-off", "state": { "on": "mdi:sleep" } },
