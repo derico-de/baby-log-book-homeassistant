@@ -144,6 +144,36 @@ Both carry the caregiving condition by default: **switch caregiving off in the a
 while nobody is looking after her, and both of these go quiet.** That is how the
 switch in the app reaches a wall.
 
+Both are **time** triggers, and that is the one thing to get right. The seven
+instants are timestamps, so Home Assistant will just as happily let you build a
+*state* trigger on `sensor.emma_feed_due` — and that one fires when the value
+changes, which is the moment you log a feed, not the moment the next one comes
+due. `trigger: time` fires at the instant the sensor holds; `trigger: state`
+fires when the instant is rewritten.
+
+`offset` works on any of the seven, in either direction, and one automation can
+carry several:
+
+```yaml
+triggers:
+  - trigger: time
+    at:
+      entity_id: sensor.emma_feed_due
+      offset: "-00:10:00"      # ten minutes early
+  - trigger: time
+    at: sensor.emma_feed_due   # on the instant
+  - trigger: time
+    at:
+      entity_id: sensor.emma_feed_due
+      offset: "00:10:00"       # ten minutes late
+```
+
+The timer is armed afresh every time the sensor changes, and only while the
+instant is still ahead. A feed logged with the next one due in five minutes
+never fires a ten-minutes-early trigger — that moment has passed — and a cleared
+Target, where the sensor reads *unknown*, arms nothing until a real instant
+comes back.
+
 ## A one-press bottle button
 
 A bottle takes an amount, so it is an action rather than a button — which is

@@ -14,6 +14,16 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+### Added
+
+- The README's automation section says which trigger to use. A timestamp sensor
+  accepts a *state* trigger as readily as a *time* one, and the state trigger
+  fires when a feed is logged rather than when the next one comes due — the
+  wrong half of the pair, and the one the automation editor offers first. The
+  section now names the difference, shows `offset` on `feed_due` in both
+  directions rather than only on `bottle_life_runs_out`, and states when the
+  timer is armed: on every change, and only while the instant is still ahead.
+
 ## [1.0.1] - 2026-09-10
 
 ### Fixed
