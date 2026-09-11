@@ -14,6 +14,8 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-11
+
 ### Added
 
 - The Household device carries the four settings the app states about this
