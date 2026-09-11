@@ -117,9 +117,47 @@ entity: sensor.emma_wake_window_up
 name: Wake window          # the device name already says "Emma"
 ```
 
+## The blueprint
+
+One automation that says the three things out loud: a feed coming due, the wake
+window up, and the open bottle running out.
+
+**Settings → Automations & scenes → Blueprints → Import blueprint**, and paste:
+
+```
+https://github.com/derico-de/baby-log-book-homeassistant/blob/main/blueprints/automation/baby_log_book/announce_what_is_due.yaml
+```
+
+Point it at her three instants and at the Household device's four settings, give
+it a speaker and a text-to-speech engine, and that is the whole setup. **The
+hours come from the app**: the night window from `night_start` and `day_start`,
+the lead times from `feed_reminder` and `sleep_reminder`. An hour stated twice is
+two places to keep in step, so nothing here asks you to type one you have already
+set — every one of them can still be overridden in the blueprint if Home
+Assistant should disagree with the app.
+
+It is quieter at night rather than silent, by default; it can be silent instead.
+It carries the caregiving condition, it will not announce a feed while she is
+already feeding or a wake window while she is already down — the app's own rule
+for its reminders — and it restores the speaker's volume afterwards.
+
+Two things about how it fires. It uses **template** triggers rather than time
+triggers, because a time trigger's `offset` is fixed when the automation loads
+and these lead times are read from the app at the moment they are needed; a
+template that calls `now()` is re-evaluated at the top of every minute, which is
+the resolution a feed reminder wants anyway. And each trigger goes true once and
+stays true until the instant behind it moves — so one announcement per due
+instant, and the next feed logged arms it again. A restart at 02:00 announces
+nothing that is already overdue.
+
+`tests/test_blueprint.py` imports this file into a real Home Assistant and drives
+it, so the wiring and the three templates are covered like the rest.
+
 ## Two automations to copy
 
-The lead time is yours, written in your trigger. The app never sends one.
+If you would rather write it yourself than import the blueprint, these are the
+two shapes it is built out of. The lead time is yours, written in your trigger.
+The app never sends one.
 
 ```yaml
 # Chime ten minutes before the bottle's life runs out.
@@ -260,7 +298,9 @@ what it calls itself on screen is *pee & poop*, the app's own words.)
 
 - **No custom card.** Entities plus stock tile cards are the destination; a card
   is polish, and it wants designing against a real wall panel.
-- **No blueprints.** Copy-paste examples, not a library to maintain.
+- **One blueprint, and no library of them.** The announcement wiring is the same
+  in every household and getting it wrong is silent, so that one ships. Anything
+  past it is a copy-paste example.
 - **No notifications to the panel.** The deployment never wakes a Hub — it ships
   instants, and your automation decides what happens at them.
 - **No milestones, measurements, meals or notes.** A wall answers *how is today

@@ -30,10 +30,29 @@ version` = the git tag = the GitHub release, bumped together in one commit.
   unlike the two staleness tells, they go unavailable with the coordinator: a
   stale Day Start would be quiet at the wrong hour and never say why.
 
+- A blueprint, `announce_what_is_due`, imported by URL: one automation that
+  announces a feed coming due, the wake window up and the open bottle running
+  out. It reads the night window and the two lead times off the Household
+  device, so nothing asks a family to restate an hour they already set in the
+  app, and every one of them can still be overridden. Quieter at night by
+  default rather than silent, carries the caregiving condition, holds its tongue
+  while she is already feeding or already asleep, and puts the speaker's volume
+  back afterwards.
+
+  Template triggers rather than time triggers: a time trigger's `offset` is
+  fixed when the automation loads, and these lead times are read at the moment
+  they are needed. Each goes true once per due instant, so a restart at 02:00
+  announces nothing that is already overdue. `tests/test_blueprint.py` imports
+  the shipped file into a real Home Assistant and drives it.
+
 ### Changed
 
 - The server floor is `1.28.0`, the release that carries those four fields on
   `GET /api/hub/state`.
+- **One blueprint is no longer none.** The README said there would be none —
+  copy-paste examples, not a library to maintain — and that still holds for
+  everything but this: the announcement wiring is identical in every household
+  and getting it wrong is silent, which is exactly what a blueprint is for.
 
 ### Added
 

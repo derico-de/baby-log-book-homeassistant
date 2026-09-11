@@ -1,0 +1,414 @@
+blueprint:
+  name: Baby Log Book — announce what is due
+  description: >-
+    One automation for the three things a wall panel is asked to say out loud: a
+    feed coming due, the wake window being up, and the open bottle running out.
+
+
+    The hours come from the app. Baby Log Book already knows when this
+    Household's night is and how much warning its own reminders give, so this
+    reads those settings rather than asking you to type them a second time —
+    an hour stated twice is two places to keep in step. Every one of them can
+    be overridden here if Home Assistant should disagree with the app.
+
+
+    It announces once per due instant, not every minute: each trigger arms again
+    only when the underlying instant moves, which is when the feed is logged.
+    Nothing nags.
+  domain: automation
+  source_url: https://github.com/derico-de/baby-log-book-homeassistant/blob/main/blueprints/automation/baby_log_book/announce_what_is_due.yaml
+  input:
+    baby:
+      name: Her three instants
+      icon: mdi:baby-face-outline
+      collapsed: false
+      input:
+        feed_due:
+          name: Feed due
+          description: The `feed_due` sensor on her device.
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+                device_class: timestamp
+        wake_window_up:
+          name: Wake window up
+          description: The `wake_window_up` sensor — when she is ready to go down again.
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+                device_class: timestamp
+        bottle_runs_out:
+          name: Bottle life runs out
+          description: >-
+            The `bottle_life_runs_out` sensor. It is unknown whenever no bottle
+            is open, and this stays quiet while it is.
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+                device_class: timestamp
+        feeding_flag:
+          name: Feeding (optional)
+          description: >-
+            Her `feeding` flag. Given one, a feed announcement is skipped while
+            she is already at the breast or the bottle — the app's own rule for
+            its reminders.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: binary_sensor
+        asleep_flag:
+          name: Asleep (optional)
+          description: >-
+            Her `asleep` flag. Given one, the wake-window announcement is
+            skipped while she is already down.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: binary_sensor
+
+    household:
+      name: What the app says
+      icon: mdi:home-heart
+      collapsed: false
+      input:
+        night_start:
+          name: Night start
+          description: >-
+            The Household device's `night_start`. Unknown where the Household
+            keeps no night, and then this never treats an hour as night.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+        day_start:
+          name: Day start
+          description: >-
+            The Household device's `day_start`. The night **ends** at the Day
+            Start — that is one boundary in the app, not two.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+        feed_reminder:
+          name: Feed reminder
+          description: >-
+            The Household device's `feed_reminder` — seconds before a feed is
+            due that the app sends its own reminder.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+        sleep_reminder:
+          name: Sleep reminder
+          description: >-
+            The Household device's `sleep_reminder` — seconds after the wake
+            window is up.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: sensor
+        caregiving:
+          name: Caregiving (optional)
+          description: >-
+            The Household device's `caregiving` flag. Given one, this goes
+            silent whenever the app's switch is off.
+          default: ""
+          selector:
+            entity:
+              filter:
+                integration: baby_log_book
+                domain: binary_sensor
+
+    overrides:
+      name: Override what the app says
+      icon: mdi:pencil-outline
+      collapsed: true
+      input:
+        use_app_night:
+          name: Take the night window from the app
+          description: >-
+            Off, and the two hours below are used instead. Also use the hours
+            below if you left the Night start and Day start entities empty.
+          default: true
+          selector:
+            boolean:
+        night_start_override:
+          name: Night starts
+          default: "22:00:00"
+          selector:
+            time:
+        night_end_override:
+          name: Night ends
+          default: "07:00:00"
+          selector:
+            time:
+        use_app_leads:
+          name: Take the lead times from the app's reminders
+          description: >-
+            Off, and the minutes below are used instead. The app's own numbers
+            are what a family already tuned for the routine.
+          default: true
+          selector:
+            boolean:
+        feed_lead_min:
+          name: Announce a feed this many minutes early
+          default: 10
+          selector:
+            number:
+              min: 0
+              max: 120
+              step: 1
+              unit_of_measurement: min
+              mode: box
+        sleep_lag_min:
+          name: Announce the wake window this many minutes late
+          default: 0
+          selector:
+            number:
+              min: 0
+              max: 120
+              step: 1
+              unit_of_measurement: min
+              mode: box
+        bottle_lead_min:
+          name: Announce the bottle this many minutes early
+          description: >-
+            The app has no setting for this one, so it is always yours.
+          default: 10
+          selector:
+            number:
+              min: 0
+              max: 120
+              step: 1
+              unit_of_measurement: min
+              mode: box
+
+    announcement:
+      name: The announcement
+      icon: mdi:speaker-message
+      collapsed: false
+      input:
+        speaker:
+          name: Speaker
+          selector:
+            entity:
+              filter:
+                domain: media_player
+        tts_engine:
+          name: Text-to-speech
+          selector:
+            entity:
+              filter:
+                domain: tts
+        night_mode:
+          name: At night
+          description: >-
+            What the night window is for. *Quietly* uses the night volume below;
+            *silent* says nothing at all until the Day Start.
+          default: quiet
+          selector:
+            select:
+              mode: list
+              options:
+                - value: quiet
+                  label: "Announce, but quietly"
+                - value: silent
+                  label: "Say nothing"
+                - value: normal
+                  label: "Announce as usual"
+        day_volume:
+          name: Volume by day
+          default: 0.35
+          selector:
+            number:
+              min: 0
+              max: 1
+              step: 0.05
+              mode: slider
+        night_volume:
+          name: Volume at night
+          default: 0.15
+          selector:
+            number:
+              min: 0
+              max: 1
+              step: 0.05
+              mode: slider
+        feed_message:
+          name: Feed message
+          default: A feed is due.
+          selector:
+            text:
+        sleep_message:
+          name: Wake window message
+          default: The wake window is up.
+          selector:
+            text:
+        bottle_message:
+          name: Bottle message
+          default: The open bottle is about to run out.
+          selector:
+            text:
+
+# Queued rather than single: two instants can come due in the same minute, and
+# an announcement that sets the speaker's volume must not have another one
+# restore it mid-sentence.
+mode: queued
+max: 5
+
+# Blueprint inputs reach a trigger template only through here, and these stay
+# available to the actions below as well.
+trigger_variables:
+  feed_due_entity: !input feed_due
+  wake_window_entity: !input wake_window_up
+  bottle_entity: !input bottle_runs_out
+  speaker_entity: !input speaker
+  feeding_flag: !input feeding_flag
+  asleep_flag: !input asleep_flag
+  night_start_entity: !input night_start
+  day_start_entity: !input day_start
+  feed_reminder_entity: !input feed_reminder
+  sleep_reminder_entity: !input sleep_reminder
+  caregiving_entity: !input caregiving
+  use_app_night: !input use_app_night
+  night_start_override: !input night_start_override
+  night_end_override: !input night_end_override
+  use_app_leads: !input use_app_leads
+  feed_lead_min: !input feed_lead_min
+  sleep_lag_min: !input sleep_lag_min
+  bottle_lead_min: !input bottle_lead_min
+  night_mode: !input night_mode
+  day_volume: !input day_volume
+  night_volume: !input night_volume
+  feed_message: !input feed_message
+  sleep_message: !input sleep_message
+  bottle_message: !input bottle_message
+
+# Template triggers rather than time triggers, for one reason: a time trigger's
+# offset is fixed when the automation is loaded, and the lead times here are
+# read from the app at the moment they are needed. A template that calls now()
+# is re-rendered at the top of every minute, which is the resolution a feed
+# reminder wants anyway.
+#
+# Each goes true once and stays true until the instant behind it moves — so one
+# announcement per due instant, and the next feed logged arms it again.
+triggers:
+  - trigger: template
+    id: feed
+    value_template: >-
+      {% set due = states(feed_due_entity) %}
+      {% set stated = states(feed_reminder_entity) if feed_reminder_entity else 'unknown' %}
+      {% set fallback = (feed_lead_min | float(10)) * 60 %}
+      {% set lead = (stated | float(fallback)) if use_app_leads else fallback %}
+      {{ due not in ['unknown', 'unavailable', 'none', '']
+         and now() >= (due | as_datetime) - timedelta(seconds=lead) }}
+
+  - trigger: template
+    id: sleep
+    value_template: >-
+      {% set up = states(wake_window_entity) %}
+      {% set stated = states(sleep_reminder_entity) if sleep_reminder_entity else 'unknown' %}
+      {% set fallback = (sleep_lag_min | float(0)) * 60 %}
+      {% set lag = (stated | float(fallback)) if use_app_leads else fallback %}
+      {{ up not in ['unknown', 'unavailable', 'none', '']
+         and now() >= (up | as_datetime) + timedelta(seconds=lag) }}
+
+  - trigger: template
+    id: bottle
+    value_template: >-
+      {% set out = states(bottle_entity) %}
+      {% set lead = (bottle_lead_min | float(10)) * 60 %}
+      {{ out not in ['unknown', 'unavailable', 'none', '']
+         and now() >= (out | as_datetime) - timedelta(seconds=lead) }}
+
+conditions: []
+
+actions:
+  # The night window, as two HH:MM strings. An empty one means this Household
+  # keeps no night — the app's own answer when Night Start equals Day Start —
+  # and then no hour is ever night.
+  - variables:
+      night_from: >-
+        {% set s = states(night_start_entity) if (use_app_night and night_start_entity) else night_start_override %}
+        {{ s[:5] if s not in ['unknown', 'unavailable', 'none', '', none] else '' }}
+      night_to: >-
+        {% set e = states(day_start_entity) if (use_app_night and day_start_entity) else night_end_override %}
+        {{ e[:5] if e not in ['unknown', 'unavailable', 'none', '', none] else '' }}
+
+  - variables:
+      is_night: >-
+        {% set t = now().strftime('%H:%M') %}
+        {{ night_from != '' and night_to != '' and night_from != night_to
+           and ((night_from < night_to and night_from <= t < night_to)
+                or (night_from > night_to and (t >= night_from or t < night_to))) }}
+
+  - alias: Silent at night, if that is what night is for
+    condition: template
+    value_template: "{{ not (is_night and night_mode == 'silent') }}"
+
+  - alias: Quiet while nobody is looking after her
+    condition: template
+    value_template: "{{ not caregiving_entity or is_state(caregiving_entity, 'on') }}"
+
+  - alias: Never while she is already feeding, or already asleep
+    condition: template
+    value_template: >-
+      {{ not (trigger.id == 'feed' and feeding_flag and is_state(feeding_flag, 'on'))
+         and not (trigger.id == 'sleep' and asleep_flag and is_state(asleep_flag, 'on')) }}
+
+  - variables:
+      message: >-
+        {%- if trigger.id == 'feed' -%}{{ feed_message }}
+        {%- elif trigger.id == 'sleep' -%}{{ sleep_message }}
+        {%- else -%}{{ bottle_message }}{%- endif -%}
+      level: "{{ night_volume if (is_night and night_mode == 'quiet') else day_volume }}"
+      previous: "{{ state_attr(speaker_entity, 'volume_level') }}"
+
+  - action: media_player.volume_set
+    target:
+      entity_id: !input speaker
+    data:
+      volume_level: "{{ level }}"
+
+  - action: tts.speak
+    target:
+      entity_id: !input tts_engine
+    data:
+      media_player_entity_id: !input speaker
+      message: "{{ message }}"
+
+  # tts.speak returns as soon as it has queued the speech, not when the speaker
+  # has finished saying it. Restore the volume without this and the
+  # announcement is cut off mid-word.
+  - wait_for_trigger:
+      - trigger: state
+        entity_id: !input speaker
+        to:
+          - idle
+          - "off"
+    timeout: "00:00:30"
+    continue_on_timeout: true
+
+  - action: media_player.volume_set
+    target:
+      entity_id: !input speaker
+    data:
+      volume_level: "{{ level if previous is none else previous }}"
