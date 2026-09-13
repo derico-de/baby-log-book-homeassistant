@@ -14,6 +14,15 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+### Fixed
+
+- The blueprint no longer goes quiet while the app's Caregiving switch is off.
+  Off means the Parents have her themselves — the switch mutes the Caregivers'
+  phones, never the family — so a wall at home was silent exactly when the
+  family was home. The `caregiving` input is gone; an automation built from the
+  older blueprint keeps working after a re-import, and the binary sensor stays
+  for a panel that wants to read it.
+
 ## [1.1.0] - 2026-09-11
 
 ### Added

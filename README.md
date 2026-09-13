@@ -137,9 +137,11 @@ set — every one of them can still be overridden in the blueprint if Home
 Assistant should disagree with the app.
 
 It is quieter at night rather than silent, by default; it can be silent instead.
-It carries the caregiving condition, it will not announce a feed while she is
-already feeding or a wake window while she is already down — the app's own rule
-for its reminders — and it restores the speaker's volume afterwards.
+It will not announce a feed while she is already feeding or a wake window while
+she is already down — the app's own rule for its reminders — and it restores the
+speaker's volume afterwards. It does **not** read the Caregiving switch: that
+switch mutes the Caregivers' phones while the Parents have her, and a wall in
+the family's own home is never off duty.
 
 Two things about how it fires. It uses **template** triggers rather than time
 triggers, because a time trigger's `offset` is fixed when the automation loads
@@ -166,10 +168,6 @@ triggers:
     at:
       entity_id: sensor.emma_bottle_life_runs_out
       offset: "-00:10:00"
-conditions:
-  - condition: state
-    entity_id: binary_sensor.home_caregiving
-    state: "on"
 actions:
   - action: media_player.play_media
     target: { entity_id: media_player.hall }
@@ -181,10 +179,6 @@ actions:
 triggers:
   - trigger: time
     at: sensor.emma_feed_due
-conditions:
-  - condition: state
-    entity_id: binary_sensor.home_caregiving
-    state: "on"
 actions:
   - action: tts.speak
     target: { entity_id: tts.piper }
@@ -193,9 +187,11 @@ actions:
       message: "Emma is due a feed."
 ```
 
-Both carry the caregiving condition by default: **switch caregiving off in the app
-while nobody is looking after her, and both of these go quiet.** That is how the
-switch in the app reaches a wall.
+Neither reads `binary_sensor.<household>_caregiving`. That switch is the app's
+way of muting the Caregivers' phones while the Parents have her; a wall at home
+is never off duty, so a condition on it would silence the panel exactly when the
+family is home. The entity is there to read — a panel in a Caregiver's flat may
+well want it — but nothing here defaults to it.
 
 Both are **time** triggers, and that is the one thing to get right. The seven
 instants are timestamps, so Home Assistant will just as happily let you build a

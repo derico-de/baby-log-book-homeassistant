@@ -125,17 +125,6 @@ blueprint:
               filter:
                 integration: baby_log_book
                 domain: sensor
-        caregiving:
-          name: Caregiving (optional)
-          description: >-
-            The Household device's `caregiving` flag. Given one, this goes
-            silent whenever the app's switch is off.
-          default: ""
-          selector:
-            entity:
-              filter:
-                integration: baby_log_book
-                domain: binary_sensor
 
     overrides:
       name: Override what the app says
@@ -287,7 +276,6 @@ trigger_variables:
   day_start_entity: !input day_start
   feed_reminder_entity: !input feed_reminder
   sleep_reminder_entity: !input sleep_reminder
-  caregiving_entity: !input caregiving
   use_app_night: !input use_app_night
   night_start_override: !input night_start_override
   night_end_override: !input night_end_override
@@ -363,10 +351,6 @@ actions:
   - alias: Silent at night, if that is what night is for
     condition: template
     value_template: "{{ not (is_night and night_mode == 'silent') }}"
-
-  - alias: Quiet while nobody is looking after her
-    condition: template
-    value_template: "{{ not caregiving_entity or is_state(caregiving_entity, 'on') }}"
 
   - alias: Never while she is already feeding, or already asleep
     condition: template

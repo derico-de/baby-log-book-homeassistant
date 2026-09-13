@@ -47,7 +47,6 @@ WIRING = {
     "day_start": "sensor.zuhause_day_start",
     "feed_reminder": "sensor.zuhause_feed_reminder",
     "sleep_reminder": "sensor.zuhause_sleep_reminder",
-    "caregiving": "binary_sensor.zuhause_caregiving",
     "speaker": SPEAKER,
     "tts_engine": TTS,
 }
@@ -254,20 +253,20 @@ async def test_it_holds_its_tongue_while_she_is_already_feeding(
     assert spoken == []
 
 
-async def test_it_holds_its_tongue_while_caregiving_is_off(
+async def test_it_speaks_whether_or_not_caregiving_is_on(
     hass: HomeAssistant,
     entry: MockConfigEntry,
     aioclient_mock: AiohttpClientMocker,
     spoken: list[ServiceCall],
     volumes: list[ServiceCall],
 ) -> None:
-    """The switch in the app reaches the wall, which is what it is for."""
+    """Caregiving off means the Parents have her — and the wall is theirs."""
     await build(hass, entry, aioclient_mock, **a_day_around_now())
     await arrives(
         hass, entry, aioclient_mock, state_payload([her(feed_due=in_minutes(8))], caregiving=False)
     )
 
-    assert spoken == []
+    assert [call.data["message"] for call in spoken] == ["A feed is due."]
 
 
 async def test_the_wake_window_and_the_bottle_speak_their_own_words(
@@ -300,3 +299,25 @@ async def test_the_wake_window_and_the_bottle_speak_their_own_words(
         "The open bottle is about to run out.",
         "The wake window is up.",
     ]
+
+
+async def test_an_automation_from_the_older_blueprint_still_loads(
+    hass: HomeAssistant,
+    entry: MockConfigEntry,
+    aioclient_mock: AiohttpClientMocker,
+    spoken: list[ServiceCall],
+    volumes: list[ServiceCall],
+) -> None:
+    """The `caregiving` input is gone; one still naming it is not an error."""
+    await build(
+        hass,
+        entry,
+        aioclient_mock,
+        **a_day_around_now(),
+        caregiving="binary_sensor.zuhause_caregiving",
+    )
+    await arrives(
+        hass, entry, aioclient_mock, state_payload([her(feed_due=in_minutes(8))], caregiving=False)
+    )
+
+    assert [call.data["message"] for call in spoken] == ["A feed is due."]
