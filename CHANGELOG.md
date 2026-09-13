@@ -14,6 +14,8 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-13
+
 ### Fixed
 
 - The blueprint no longer goes quiet while the app's Caregiving switch is off.
