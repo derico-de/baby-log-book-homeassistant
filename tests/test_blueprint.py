@@ -34,6 +34,8 @@ AUTOMATION_DOMAIN = "automation"
 
 SPEAKER = "media_player.hall"
 TTS = "tts.piper"
+#: A speaker's own announcement volume, the way a Sendspin player exposes it.
+ANNOUNCE_SETTING = "number.hall_announce_volume"
 
 #: Her three instants, and the Household's four settings, as this blueprint
 #: expects to be pointed at them.
@@ -111,6 +113,13 @@ def volumes(hass: HomeAssistant) -> list[ServiceCall]:
     return calls
 
 
+@pytest.fixture
+def settings(hass: HomeAssistant) -> list[ServiceCall]:
+    """Every `number.set_value` it makes."""
+    calls: list[ServiceCall] = async_mock_service(hass, "number", "set_value")
+    return calls
+
+
 async def build(
     hass: HomeAssistant,
     entry: MockConfigEntry,
@@ -139,6 +148,7 @@ async def build(
     # A speaker that is on and already turned up, so the restore has something
     # to put back.
     hass.states.async_set(SPEAKER, "idle", {"volume_level": 0.8})
+    hass.states.async_set(ANNOUNCE_SETTING, "50", {"min": 0, "max": 100, "step": 1})
 
     assert await async_setup_component(
         hass,
@@ -321,3 +331,51 @@ async def test_an_automation_from_the_older_blueprint_still_loads(
     )
 
     assert [call.data["message"] for call in spoken] == ["A feed is due."]
+
+
+async def test_a_speaker_with_its_own_announcement_volume_gets_the_level_written_there(
+    hass: HomeAssistant,
+    entry: MockConfigEntry,
+    aioclient_mock: AiohttpClientMocker,
+    spoken: list[ServiceCall],
+    volumes: list[ServiceCall],
+    settings: list[ServiceCall],
+) -> None:
+    """A Sendspin player plays every announcement at its own number, so 0.35 goes there as 35.
+
+    Its media player volume is left alone: set it too and the two restores race,
+    and the music afterwards comes out at the announcement's level.
+    """
+    await build(
+        hass, entry, aioclient_mock, **a_day_around_now(), announce_volume_setting=ANNOUNCE_SETTING
+    )
+    await arrives(hass, entry, aioclient_mock, state_payload([her(feed_due=in_minutes(8))]))
+
+    assert len(spoken) == 1
+    assert [(call.data["entity_id"], call.data["value"]) for call in settings] == [
+        ([ANNOUNCE_SETTING], 35)
+    ]
+    assert volumes == []
+
+
+async def test_the_announcement_volume_setting_is_quieter_at_night_too(
+    hass: HomeAssistant,
+    entry: MockConfigEntry,
+    aioclient_mock: AiohttpClientMocker,
+    spoken: list[ServiceCall],
+    settings: list[ServiceCall],
+) -> None:
+    """The night volume is scaled over the number's own range, not assumed 0 to 100."""
+    hass.states.async_set(ANNOUNCE_SETTING, "0.5", {"min": 0, "max": 1, "step": 0.05})
+    await build(
+        hass,
+        entry,
+        aioclient_mock,
+        **a_night_around_now(),
+        announce_volume_setting=ANNOUNCE_SETTING,
+    )
+    hass.states.async_set(ANNOUNCE_SETTING, "0.5", {"min": 0, "max": 1, "step": 0.05})
+    await arrives(hass, entry, aioclient_mock, state_payload([her(feed_due=in_minutes(8))]))
+
+    assert len(spoken) == 1
+    assert [call.data["value"] for call in settings] == [0.15]

@@ -143,6 +143,14 @@ speaker's volume afterwards. It does **not** read the Caregiving switch: that
 switch mutes the Caregivers' phones while the Parents have her, and a wall in
 the family's own home is never off duty.
 
+Some speakers keep a volume of their own for announcements and play every one
+at it, whatever the media player was set to just before — a Sendspin or
+Sonocotta player exposes it as an *Announce Volume* number, and its firmware
+puts the media player's volume back afterwards itself. Name that number as the
+**Announcement volume setting** and the day and night volumes are written into
+it instead, scaled over its own range; the media player's volume is then left
+alone, so the speaker's own restore and the blueprint's cannot race.
+
 Two things about how it fires. It uses **template** triggers rather than time
 triggers, because a time trigger's `offset` is fixed when the automation loads
 and these lead times are read from the app at the moment they are needed; a

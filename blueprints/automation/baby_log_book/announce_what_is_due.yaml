@@ -241,6 +241,19 @@ blueprint:
               max: 1
               step: 0.05
               mode: slider
+        announce_volume_setting:
+          name: Announcement volume setting (optional)
+          description: >-
+            Some speakers keep their own volume for announcements and play every
+            one at it, whatever the media player's volume was set to — a Sendspin
+            or Sonocotta player exposes it as an *Announce Volume* number. Name
+            that number here, and the two volumes above are written into it
+            instead, over its own range.
+          default: ""
+          selector:
+            entity:
+              filter:
+                domain: number
         feed_message:
           name: Feed message
           default: A feed is due.
@@ -286,6 +299,7 @@ trigger_variables:
   night_mode: !input night_mode
   day_volume: !input day_volume
   night_volume: !input night_volume
+  announce_setting_entity: !input announce_volume_setting
   feed_message: !input feed_message
   sleep_message: !input sleep_message
   bottle_message: !input bottle_message
@@ -366,11 +380,30 @@ actions:
       level: "{{ night_volume if (is_night and night_mode == 'quiet') else day_volume }}"
       previous: "{{ state_attr(speaker_entity, 'volume_level') }}"
 
-  - action: media_player.volume_set
-    target:
-      entity_id: !input speaker
-    data:
-      volume_level: "{{ level }}"
+  # A speaker with its own announcement volume plays every announcement at that
+  # setting and puts the media player's volume back afterwards itself. Write the
+  # level into the setting, scaled over its range, and leave the media player's
+  # volume alone — set it too and the two restores race, and the speaker is
+  # left at the announcement's level for the music that follows.
+  - if:
+      - condition: template
+        value_template: "{{ announce_setting_entity != '' }}"
+    then:
+      - action: number.set_value
+        target:
+          entity_id: "{{ announce_setting_entity }}"
+        data:
+          value: >-
+            {% set low = state_attr(announce_setting_entity, 'min') | float(0) %}
+            {% set high = state_attr(announce_setting_entity, 'max') | float(100) %}
+            {% set step = state_attr(announce_setting_entity, 'step') | float(1) %}
+            {{ (((low + (level | float) * (high - low)) / step) | round(0) * step) | round(2) }}
+    else:
+      - action: media_player.volume_set
+        target:
+          entity_id: !input speaker
+        data:
+          volume_level: "{{ level }}"
 
   - action: tts.speak
     target:
@@ -382,17 +415,21 @@ actions:
   # tts.speak returns as soon as it has queued the speech, not when the speaker
   # has finished saying it. Restore the volume without this and the
   # announcement is cut off mid-word.
-  - wait_for_trigger:
-      - trigger: state
-        entity_id: !input speaker
-        to:
-          - idle
-          - "off"
-    timeout: "00:00:30"
-    continue_on_timeout: true
+  - if:
+      - condition: template
+        value_template: "{{ announce_setting_entity == '' }}"
+    then:
+      - wait_for_trigger:
+          - trigger: state
+            entity_id: !input speaker
+            to:
+              - idle
+              - "off"
+        timeout: "00:00:30"
+        continue_on_timeout: true
 
-  - action: media_player.volume_set
-    target:
-      entity_id: !input speaker
-    data:
-      volume_level: "{{ level if previous is none else previous }}"
+      - action: media_player.volume_set
+        target:
+          entity_id: !input speaker
+        data:
+          volume_level: "{{ level if previous is none else previous }}"

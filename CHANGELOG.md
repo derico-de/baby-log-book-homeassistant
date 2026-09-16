@@ -14,6 +14,16 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+### Added
+
+- The blueprint takes an optional **Announcement volume setting**: a number
+  entity for a speaker that plays every announcement at its own volume — a
+  Sendspin or Sonocotta player's *Announce Volume* — rather than at whatever
+  the media player was set to. Given one, the day and night volumes are written
+  there, scaled over its range, and the media player's volume is left alone, so
+  the firmware's own restore no longer leaves the speaker at the announcement's
+  level for the music that follows.
+
 ## [1.1.1] - 2026-09-13
 
 ### Fixed
