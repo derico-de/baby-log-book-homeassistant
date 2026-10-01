@@ -21,7 +21,7 @@ dev = [
     # says and what the dev-env container runs. Dependabot moves it weekly; the
     # floor follows at release time, never before (spec §6.10).
     "pytest-homeassistant-custom-component==0.13.357",
-    "ruff==0.16.6",
+    "ruff==0.16.9",
     "mypy==2.3.1",
 ]
 
