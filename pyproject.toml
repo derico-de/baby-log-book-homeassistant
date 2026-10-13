@@ -22,7 +22,7 @@ dev = [
     # floor follows at release time, never before (spec §6.10).
     "pytest-homeassistant-custom-component==0.13.357",
     "ruff==0.16.6",
-    "mypy==2.3.1",
+    "mypy==2.4.0",
 ]
 
 [tool.ruff]
