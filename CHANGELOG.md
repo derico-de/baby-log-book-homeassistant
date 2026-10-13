@@ -14,6 +14,15 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+### Changed
+
+- Development type checking uses mypy 2.4.0, with its dependencies pinned in
+  `uv.lock` for reproducible CI and local checks.
+- The release workflow uses `softprops/action-gh-release` v3 with the Node 24
+  runtime supported by GitHub-hosted runners.
+- CI and release workflows use `actions/checkout` v7, including its safer
+  defaults for privileged pull-request checkouts.
+
 ### Added
 
 - The blueprint takes an optional **Announcement volume setting**: a number
