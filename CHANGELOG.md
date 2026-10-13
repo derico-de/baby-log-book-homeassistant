@@ -16,6 +16,8 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ### Changed
 
+- The release workflow uses `softprops/action-gh-release` v3 with the Node 24
+  runtime supported by GitHub-hosted runners.
 - CI and release workflows use `actions/checkout` v7, including its safer
   defaults for privileged pull-request checkouts.
 
