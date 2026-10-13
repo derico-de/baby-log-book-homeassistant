@@ -16,6 +16,8 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ### Changed
 
+- Development linting and formatting use Ruff 0.16.10, with the matching
+  version pinned in `uv.lock`.
 - Development type checking uses mypy 2.4.0, with its dependencies pinned in
   `uv.lock` for reproducible CI and local checks.
 - The release workflow uses `softprops/action-gh-release` v3 with the Node 24
