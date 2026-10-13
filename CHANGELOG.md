@@ -14,6 +14,11 @@ version` = the git tag = the GitHub release, bumped together in one commit.
 
 ## [Unreleased]
 
+### Changed
+
+- CI and release workflows use `actions/checkout` v7, including its safer
+  defaults for privileged pull-request checkouts.
+
 ### Added
 
 - The blueprint takes an optional **Announcement volume setting**: a number
