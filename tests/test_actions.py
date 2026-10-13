@@ -43,6 +43,16 @@ def pushed(mocker: AiohttpClientMocker) -> dict[str, Any]:
     return revision
 
 
+def all_pushed(mocker: AiohttpClientMocker) -> list[dict[str, Any]]:
+    """Every revision every push carried, in order."""
+    return [
+        revision
+        for call in mocker.mock_calls
+        if call[1].path == "/api/sync/push"
+        for revision in call[2]["revisions"]
+    ]
+
+
 async def press(hass: HomeAssistant, entity_id: str) -> None:
     """Press one button."""
     await hass.services.async_call("button", "press", {ATTR_ENTITY_ID: entity_id}, blocking=True)
@@ -211,6 +221,88 @@ async def test_a_bottle_feed_targets_the_babys_device(
     assert fields["volume_ml"] == 120
     assert fields["contents"] == "formula"
     assert "leftover_ml" not in fields
+
+
+async def test_the_device_picker_offers_the_babies_and_nothing_else(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A device field, not a `target`, which hassfest refuses with a device filter on it.
+
+    A target would also take entities, areas and labels, none of which the
+    handler can resolve to a Baby.
+    """
+    from homeassistant.helpers.service import async_get_all_descriptions
+
+    mock_state(aioclient_mock)
+    assert await setup_entry(hass, entry, aioclient_mock)
+    descriptions = await async_get_all_descriptions(hass)
+    devices = dr.async_entries_for_config_entry(dr.async_get(hass), entry.entry_id)
+
+    for service in (SERVICE_LOG_BOTTLE_FEED, SERVICE_LOG_NAPPY):
+        description = descriptions[DOMAIN][service]
+        assert "target" not in description
+        field = description["fields"][ATTR_DEVICE_ID]
+        assert field["required"] is True
+        selector = field["selector"]["device"]
+        assert selector["multiple"] is True
+        (device_filter,) = selector["filter"]
+        assert device_filter["integration"] == DOMAIN
+        offered = [device.id for device in devices if device.model == device_filter["model"]]
+        assert offered == [device_of(hass, f"baby_{BABY_ID}")]
+
+
+async def test_a_script_that_names_the_baby_as_a_target_still_logs(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """The README once put the device under `target:`, and scripts in the wild still do."""
+    from homeassistant.helpers.service import async_call_from_config
+
+    mock_state(aioclient_mock)
+    assert await setup_entry(hass, entry, aioclient_mock)
+    aioclient_mock.clear_requests()
+    mock_push(aioclient_mock)
+
+    await async_call_from_config(
+        hass,
+        {
+            "action": f"{DOMAIN}.{SERVICE_LOG_BOTTLE_FEED}",
+            "target": {ATTR_DEVICE_ID: device_of(hass, f"baby_{BABY_ID}")},
+            "data": {"volume_ml": 120},
+        },
+        blocking=True,
+    )
+
+    fields = pushed(aioclient_mock)["fields"]
+    assert fields["baby_id"] == BABY_ID
+    assert fields["volume_ml"] == 120
+
+
+async def test_two_babies_get_one_entry_each(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A list of devices logs the same nappy for every Baby named."""
+    mock_state(
+        aioclient_mock,
+        state_payload([baby(), baby(id="b2", name="Mia")]),
+    )
+    assert await setup_entry(hass, entry, aioclient_mock)
+    aioclient_mock.clear_requests()
+    mock_push(aioclient_mock)
+
+    await hass.services.async_call(
+        DOMAIN,
+        SERVICE_LOG_NAPPY,
+        {
+            ATTR_DEVICE_ID: [device_of(hass, f"baby_{BABY_ID}"), device_of(hass, "baby_b2")],
+            "pee": True,
+            "poop": False,
+        },
+        blocking=True,
+    )
+
+    revisions = all_pushed(aioclient_mock)
+    assert [revision["fields"]["baby_id"] for revision in revisions] == [BABY_ID, "b2"]
+    assert all(revision["fields"]["type"] == "nappy" for revision in revisions)
 
 
 async def test_a_nappy_is_one_entry(

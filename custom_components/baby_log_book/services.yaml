@@ -4,12 +4,23 @@
 #
 # Neither schema has a baby_id field, and neither ever will: a call names the
 # Baby's device and the integration resolves it.
+#
+# The device is a `device_id` field with a device selector rather than a
+# `target` block: hassfest refuses a device filter under `target`, and a target
+# would also take entities, areas and labels the handler has no way to resolve.
+# The selector is narrowed to this integration's Baby devices, which is exactly
+# the set the handler accepts.
 
 log_bottle_feed:
-  target:
-    device:
-      integration: baby_log_book
   fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          multiple: true
+          filter:
+            integration: baby_log_book
+            model: Baby
     volume_ml:
       required: true
       example: 120
@@ -42,10 +53,15 @@ log_bottle_feed:
           mode: box
 
 log_nappy:
-  target:
-    device:
-      integration: baby_log_book
   fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          multiple: true
+          filter:
+            integration: baby_log_book
+            model: Baby
     pee:
       required: true
       selector:

@@ -24,6 +24,14 @@ version` = the git tag = the GitHub release, bumped together in one commit.
   the firmware's own restore no longer leaves the speaker at the announcement's
   level for the music that follows.
 
+### Fixed
+
+- The two actions take the Baby's device as a `device_id` field with a device
+  selector instead of a `target`, which hassfest now refuses with a device
+  filter on it. The picker offers only Baby devices, a list of them still logs
+  one entry each, and scripts written with `target: { device_id: … }` keep
+  working.
+
 ## [1.1.1] - 2026-09-13
 
 ### Fixed

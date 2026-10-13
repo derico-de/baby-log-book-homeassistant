@@ -288,11 +288,13 @@ script:
     alias: Emma — 120 ml
     sequence:
       - action: baby_log_book.log_bottle_feed
-        target:
-          device_id: abc123…          # the Baby's device, not a baby id
         data:
+          device_id: abc123…          # the Baby's device, not a baby id
           volume_ml: 120
 ```
+
+The device is a field, not a `target`: the picker offers only this
+integration's Baby devices, and a list of them logs the same bottle for each.
 
 `baby_log_book.log_nappy` logs a pee, a poop or both the same way, with `pee`
 and `poop` and optionally `where` and `consistency`. (The action id is fixed;
