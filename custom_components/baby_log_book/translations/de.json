@@ -196,7 +196,7 @@
       "fields": {
         "device_id": {
           "name": "Baby",
-          "description": "Das Gerät des Babys. Mehrere auswählen, um dieselbe Windel für jedes zu erfassen."
+          "description": "Das Gerät des Babys. Mehrere auswählen, um denselben Pipi-&-Kaka-Eintrag für jedes zu erfassen."
         },
         "pee": {
           "name": "Pipi",

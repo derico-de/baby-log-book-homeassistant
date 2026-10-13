@@ -196,7 +196,7 @@
       "fields": {
         "device_id": {
           "name": "Bebeluș",
-          "description": "Dispozitivul bebelușului. Alege mai multe pentru a înregistra același scutec pentru fiecare."
+          "description": "Dispozitivul bebelușului. Alege mai multe pentru a înregistra aceeași intrare de pipi & caca pentru fiecare."
         },
         "pee": {
           "name": "Pipi",

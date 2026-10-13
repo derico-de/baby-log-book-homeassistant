@@ -196,7 +196,7 @@
       "fields": {
         "device_id": {
           "name": "Baby",
-          "description": "The Baby's device. Pick more than one to log the same nappy for each."
+          "description": "The Baby's device. Pick more than one to log the same pee & poop entry for each."
         },
         "pee": {
           "name": "Pee",
