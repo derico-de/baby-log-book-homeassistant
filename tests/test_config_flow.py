@@ -198,10 +198,10 @@ async def test_a_lapsed_household(hass: HomeAssistant, aioclient_mock: AiohttpCl
 
 async def test_a_server_too_old(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> None:
     """The claim-time half of the dual gate, carrying both numbers."""
-    mock_preview(aioclient_mock, app_version="1.24.0")
+    mock_preview(aioclient_mock, app_version="1.27.0")
     result = await paste(hass)
     assert result["errors"] == {"base": "server_too_old"}
-    assert result["description_placeholders"] == {"minimum": "1.25.0", "server": "1.24.0"}
+    assert result["description_placeholders"] == {"minimum": "1.28.0", "server": "1.27.0"}
 
 
 async def test_a_household_already_configured(

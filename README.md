@@ -78,9 +78,24 @@ reset at the Household's own day start rather than at midnight, so an 05:00
 household gets an 05:00 day. Milk and tummy time appear the first time either is
 ever logged, and never go away again.
 
-On the Household device: `binary_sensor.<household>_caregiving`, and two
+On the Household device: `binary_sensor.<household>_caregiving`, two
 diagnostics — when the panel last heard the server, and how many presses are
-still queued. Naming the Household is optional in the app, and one that has not
+still queued — and the four settings the app states about this Household's day.
+
+| Entity | Reads |
+| --- | --- |
+| `sensor.<household>_day_start` | the stated Day Start, `HH:MM` |
+| `sensor.<household>_night_start` | when the night begins, `HH:MM`, or unknown where the Household keeps none |
+| `sensor.<household>_feed_reminder` | seconds *before* a feed is due that the app sends its own reminder |
+| `sensor.<household>_sleep_reminder` | seconds *after* the wake window is up that it sends the other one |
+
+Those four exist so an hour is stated **once**. A night window typed again in
+Home Assistant is a second place to keep it in step, and the two drift; the app
+is where a family already sets its day, so read it from there. They are
+diagnostic entities — usable in any automation, out of the way on a dashboard —
+and they go unavailable with the rest when the panel loses the server, because a
+stale Day Start would be quiet at the wrong hour and never say why. No reminder
+crosses the wire and none ever will: these are the numbers behind one. Naming the Household is optional in the app, and one that has not
 been named is called **Baby Log Book** here, because Home Assistant has to write
 something on the device.
 
@@ -102,9 +117,57 @@ entity: sensor.emma_wake_window_up
 name: Wake window          # the device name already says "Emma"
 ```
 
+## The blueprint
+
+One automation that says the three things out loud: a feed coming due, the wake
+window up, and the open bottle running out.
+
+**Settings → Automations & scenes → Blueprints → Import blueprint**, and paste:
+
+```
+https://github.com/derico-de/baby-log-book-homeassistant/blob/main/blueprints/automation/baby_log_book/announce_what_is_due.yaml
+```
+
+Point it at her three instants and at the Household device's four settings, give
+it a speaker and a text-to-speech engine, and that is the whole setup. **The
+hours come from the app**: the night window from `night_start` and `day_start`,
+the lead times from `feed_reminder` and `sleep_reminder`. An hour stated twice is
+two places to keep in step, so nothing here asks you to type one you have already
+set — every one of them can still be overridden in the blueprint if Home
+Assistant should disagree with the app.
+
+It is quieter at night rather than silent, by default; it can be silent instead.
+It will not announce a feed while she is already feeding or a wake window while
+she is already down — the app's own rule for its reminders — and it restores the
+speaker's volume afterwards. It does **not** read the Caregiving switch: that
+switch mutes the Caregivers' phones while the Parents have her, and a wall in
+the family's own home is never off duty.
+
+Some speakers keep a volume of their own for announcements and play every one
+at it, whatever the media player was set to just before — a Sendspin or
+Sonocotta player exposes it as an *Announce Volume* number, and its firmware
+puts the media player's volume back afterwards itself. Name that number as the
+**Announcement volume setting** and the day and night volumes are written into
+it instead, scaled over its own range; the media player's volume is then left
+alone, so the speaker's own restore and the blueprint's cannot race.
+
+Two things about how it fires. It uses **template** triggers rather than time
+triggers, because a time trigger's `offset` is fixed when the automation loads
+and these lead times are read from the app at the moment they are needed; a
+template that calls `now()` is re-evaluated at the top of every minute, which is
+the resolution a feed reminder wants anyway. And each trigger goes true once and
+stays true until the instant behind it moves — so one announcement per due
+instant, and the next feed logged arms it again. A restart at 02:00 announces
+nothing that is already overdue.
+
+`tests/test_blueprint.py` imports this file into a real Home Assistant and drives
+it, so the wiring and the three templates are covered like the rest.
+
 ## Two automations to copy
 
-The lead time is yours, written in your trigger. The app never sends one.
+If you would rather write it yourself than import the blueprint, these are the
+two shapes it is built out of. The lead time is yours, written in your trigger.
+The app never sends one.
 
 ```yaml
 # Chime ten minutes before the bottle's life runs out.
@@ -113,10 +176,6 @@ triggers:
     at:
       entity_id: sensor.emma_bottle_life_runs_out
       offset: "-00:10:00"
-conditions:
-  - condition: state
-    entity_id: binary_sensor.home_caregiving
-    state: "on"
 actions:
   - action: media_player.play_media
     target: { entity_id: media_player.hall }
@@ -128,10 +187,6 @@ actions:
 triggers:
   - trigger: time
     at: sensor.emma_feed_due
-conditions:
-  - condition: state
-    entity_id: binary_sensor.home_caregiving
-    state: "on"
 actions:
   - action: tts.speak
     target: { entity_id: tts.piper }
@@ -140,9 +195,87 @@ actions:
       message: "Emma is due a feed."
 ```
 
-Both carry the caregiving condition by default: **switch caregiving off in the app
-while nobody is looking after her, and both of these go quiet.** That is how the
-switch in the app reaches a wall.
+Neither reads `binary_sensor.<household>_caregiving`. That switch is the app's
+way of muting the Caregivers' phones while the Parents have her; a wall at home
+is never off duty, so a condition on it would silence the panel exactly when the
+family is home. The entity is there to read — a panel in a Caregiver's flat may
+well want it — but nothing here defaults to it.
+
+Both are **time** triggers, and that is the one thing to get right. The seven
+instants are timestamps, so Home Assistant will just as happily let you build a
+*state* trigger on `sensor.emma_feed_due` — and that one fires when the value
+changes, which is the moment you log a feed, not the moment the next one comes
+due. `trigger: time` fires at the instant the sensor holds; `trigger: state`
+fires when the instant is rewritten.
+
+`offset` works on any of the seven, in either direction, and one automation can
+carry several:
+
+```yaml
+triggers:
+  - trigger: time
+    at:
+      entity_id: sensor.emma_feed_due
+      offset: "-00:10:00"      # ten minutes early
+  - trigger: time
+    at: sensor.emma_feed_due   # on the instant
+  - trigger: time
+    at:
+      entity_id: sensor.emma_feed_due
+      offset: "00:10:00"       # ten minutes late
+```
+
+The timer is armed afresh every time the sensor changes, and only while the
+instant is still ahead. A feed logged with the next one due in five minutes
+never fires a ten-minutes-early trigger — that moment has passed — and a cleared
+Target, where the sensor reads *unknown*, arms nothing until a real instant
+comes back.
+
+## A quiet announcement
+
+`tts.speak` plays at whatever the speaker is already set to, which at three in
+the morning is whatever the last person listening to music left it at. That is
+Home Assistant's business rather than ours, but it is the first thing a family
+hits, so:
+
+```yaml
+actions:
+  - variables:
+      previous: "{{ state_attr('media_player.hall', 'volume_level') }}"
+  - action: media_player.volume_set
+    target: { entity_id: media_player.hall }
+    data:
+      volume_level: >
+        {{ 0.15 if today_at('22:00') <= now() or now() < today_at('07:00')
+           else 0.35 }}
+  - action: tts.speak
+    target: { entity_id: tts.piper }
+    data:
+      media_player_entity_id: media_player.hall
+      message: "Emma is due a feed."
+  - wait_for_trigger:
+      - trigger: state
+        entity_id: media_player.hall
+        to: "idle"
+    timeout: "00:00:30"
+  - action: media_player.volume_set
+    target: { entity_id: media_player.hall }
+    data:
+      volume_level: "{{ previous | default(0.35) }}"
+```
+
+Two things bite here. `tts.speak` returns as soon as it has queued the speech,
+not when the speaker has finished saying it — restore the volume without that
+wait and the announcement is cut off mid-word. And `previous` is nothing at all
+if the speaker was off, hence the default.
+
+A Sonos makes the whole dance unnecessary: `sonos.snapshot` and `sonos.restore`
+take the volume *and* whatever was playing, in one action each. A Google or Nest
+speaker accepts `announce: true` on `media_player.play_media`, which ducks the
+music instead of stopping it — but it announces at its own fixed level, which is
+louder rather than quieter. In a house with a sleeping baby the calmest answer
+is often not one speaker argued with but a second, quieter one, picked by the
+hour.
 
 ## A one-press bottle button
 
@@ -169,7 +302,9 @@ what it calls itself on screen is *pee & poop*, the app's own words.)
 
 - **No custom card.** Entities plus stock tile cards are the destination; a card
   is polish, and it wants designing against a real wall panel.
-- **No blueprints.** Copy-paste examples, not a library to maintain.
+- **One blueprint, and no library of them.** The announcement wiring is the same
+  in every household and getting it wrong is silent, so that one ships. Anything
+  past it is a copy-paste example.
 - **No notifications to the panel.** The deployment never wakes a Hub — it ships
   instants, and your automation decides what happens at them.
 - **No milestones, measurements, meals or notes.** A wall answers *how is today
@@ -188,7 +323,14 @@ Each release names the oldest server and the oldest Home Assistant it works with
 
 | Integration | Needs Baby Log Book | Needs Home Assistant |
 | --- | --- | --- |
-| 1.0.0 | ≥ 1.25.0 | ≥ 2026.8.3 |
+| 1.1.0 | ≥ 1.28.0 | ≥ 2026.8.3 |
+| 1.0.1 | ≥ 1.26.0 | ≥ 2026.8.3 |
+| 1.0.0 | ≥ 1.26.0 | ≥ 2026.8.3 |
+
+`1.0.0`'s own gate says `1.25.0`, and that number was never true: `GET
+/api/hub/state`, the one read this panel makes, first shipped in **1.26.0**. On
+a 1.25.0 deployment 1.0.0 accepts the Claim Link, spends it, and then finds
+nothing to read. `1.0.1` states the floor it always had.
 
 ## Development
 

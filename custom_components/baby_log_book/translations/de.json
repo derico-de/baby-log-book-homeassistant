@@ -94,6 +94,18 @@
       },
       "pending_writes": {
         "name": "Ausstehende Schreibvorgänge"
+      },
+      "day_start": {
+        "name": "Tagesbeginn"
+      },
+      "night_start": {
+        "name": "Nachtbeginn"
+      },
+      "feed_notice_s": {
+        "name": "Erinnerung Mahlzeit"
+      },
+      "sleep_notice_s": {
+        "name": "Erinnerung Schlaf"
       }
     },
     "binary_sensor": {

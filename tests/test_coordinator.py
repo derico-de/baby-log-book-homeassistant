@@ -285,10 +285,10 @@ async def test_a_server_too_old_blocks_every_setup(
     hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
 ) -> None:
     """The second half of ADR-0039's dual gate."""
-    mock_state(aioclient_mock, state_payload() | {"app_version": "1.24.0"})
+    mock_state(aioclient_mock, state_payload() | {"app_version": "1.27.0"})
     assert not await setup_entry(hass, entry, aioclient_mock)
     assert entry.state is ConfigEntryState.SETUP_ERROR
-    assert "1.25.0" in str(entry.reason)
+    assert "1.28.0" in str(entry.reason)
 
 
 async def test_no_per_response_version_check_at_runtime(

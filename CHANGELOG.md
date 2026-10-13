@@ -12,6 +12,107 @@ update.
 Versions are independent of the server's, from `1.0.0`. `manifest.json →
 version` = the git tag = the GitHub release, bumped together in one commit.
 
+## [Unreleased]
+
+### Changed
+
+- CI and release workflows use `actions/checkout` v7, including its safer
+  defaults for privileged pull-request checkouts.
+
+### Added
+
+- The blueprint takes an optional **Announcement volume setting**: a number
+  entity for a speaker that plays every announcement at its own volume — a
+  Sendspin or Sonocotta player's *Announce Volume* — rather than at whatever
+  the media player was set to. Given one, the day and night volumes are written
+  there, scaled over its range, and the media player's volume is left alone, so
+  the firmware's own restore no longer leaves the speaker at the announcement's
+  level for the music that follows.
+
+## [1.1.1] - 2026-09-13
+
+### Fixed
+
+- The blueprint no longer goes quiet while the app's Caregiving switch is off.
+  Off means the Parents have her themselves — the switch mutes the Caregivers'
+  phones, never the family — so a wall at home was silent exactly when the
+  family was home. The `caregiving` input is gone; an automation built from the
+  older blueprint keeps working after a re-import, and the binary sensor stays
+  for a panel that wants to read it.
+
+## [1.1.0] - 2026-09-11
+
+### Added
+
+- The Household device carries the four settings the app states about this
+  Household's day: `day_start`, `night_start`, `feed_reminder` and
+  `sleep_reminder`. A family that wants the wall quieter at night had no way to
+  ask Home Assistant when this Household's night is — `day_reset_at` is an
+  instant, and a night window's end is an hour that has to hold tomorrow too —
+  and one that had already set a reminder offset in the app was being asked for
+  it a second time here. An hour stated twice is two places to keep in step.
+
+  `night_start` is the Night **in force**, so a Household that keeps none reads
+  unknown rather than repeating its Day Start. All four are diagnostic
+  entities — usable in any automation, out of the way on a dashboard — and,
+  unlike the two staleness tells, they go unavailable with the coordinator: a
+  stale Day Start would be quiet at the wrong hour and never say why.
+
+- A blueprint, `announce_what_is_due`, imported by URL: one automation that
+  announces a feed coming due, the wake window up and the open bottle running
+  out. It reads the night window and the two lead times off the Household
+  device, so nothing asks a family to restate an hour they already set in the
+  app, and every one of them can still be overridden. Quieter at night by
+  default rather than silent, carries the caregiving condition, holds its tongue
+  while she is already feeding or already asleep, and puts the speaker's volume
+  back afterwards.
+
+  Template triggers rather than time triggers: a time trigger's `offset` is
+  fixed when the automation loads, and these lead times are read at the moment
+  they are needed. Each goes true once per due instant, so a restart at 02:00
+  announces nothing that is already overdue. `tests/test_blueprint.py` imports
+  the shipped file into a real Home Assistant and drives it.
+
+### Changed
+
+- The server floor is `1.28.0`, the release that carries those four fields on
+  `GET /api/hub/state`.
+- **One blueprint is no longer none.** The README said there would be none —
+  copy-paste examples, not a library to maintain — and that still holds for
+  everything but this: the announcement wiring is identical in every household
+  and getting it wrong is silent, which is exactly what a blueprint is for.
+
+### Added
+
+- The README's automation section says which trigger to use. A timestamp sensor
+  accepts a *state* trigger as readily as a *time* one, and the state trigger
+  fires when a feed is logged rather than when the next one comes due — the
+  wrong half of the pair, and the one the automation editor offers first. The
+  section now names the difference, shows `offset` on `feed_due` in both
+  directions rather than only on `bottle_life_runs_out`, and states when the
+  timer is armed: on every change, and only while the instant is still ahead.
+- A README section on announcing quietly. `tts.speak` plays at whatever the
+  speaker was left at, and a feed announcement lands at three in the morning:
+  set the volume by the hour, wait for the speaker to go idle — `tts.speak`
+  returns when the speech is queued, not when it has been said — and put the
+  volume back. With the Sonos snapshot pair and the Google `announce` caveat
+  beside it.
+
+## [1.0.1] - 2026-09-10
+
+### Fixed
+
+- The server floor is `1.26.0`, the release that actually carries the wire this
+  panel reads. `MIN_SERVER_VERSION` said `1.25.0` and no 1.25.0 deployment has
+  ever had `GET /api/hub/state` — it shipped in 1.26.0, together with the Hub's
+  Member kind, the version a claim link reports before it is spent, and the
+  running sessions the three end-buttons need. The old number let a 1.25.0
+  server through setup, spent the one-shot Claim Link on it and then found
+  nothing to read; the version gate now refuses it while the link is still
+  good, which is the whole point of reading the version first (ADR-0039). The
+  compatibility table in the README names the corrected floor for both
+  releases.
+
 ## [1.0.0] - 2026-09-10
 
 ### Added

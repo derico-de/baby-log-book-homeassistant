@@ -1,4 +1,4 @@
-"""The read surface: seven instants and six totals per Baby, two on the Household.
+"""The read surface: seven instants and six totals per Baby, six on the Household.
 
 The seven instants carry the timestamp device class, which is the whole trick:
 the frontend renders them relative, live and localized for free — *vor 12
@@ -27,6 +27,8 @@ from homeassistant.util import dt as dt_util
 
 from .const import (
     FIRST_USE_TOTAL_KEYS,
+    HOUSEHOLD_HOUR_KEYS,
+    HOUSEHOLD_NOTICE_KEYS,
     KEY_LAST_UPDATE,
     KEY_PENDING_WRITES,
     TIMESTAMP_KEYS,
@@ -55,13 +57,20 @@ async def async_setup_entry(
     entry: BabyLogBookConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Seven instants and six totals per Baby, plus the Household's two."""
+    """Seven instants and six totals per Baby, plus the Household's six."""
     coordinator = entry.runtime_data
     async_add_baby_entities(coordinator, async_add_entities, BabyInstantSensor, TIMESTAMP_KEYS)
     async_add_baby_entities(
         coordinator, async_add_entities, BabyTotalSensor, TOTAL_KEYS, FIRST_USE_TOTAL_KEYS
     )
-    async_add_entities([LastUpdateSensor(coordinator), PendingWritesSensor(coordinator)])
+    async_add_entities(
+        [
+            LastUpdateSensor(coordinator),
+            PendingWritesSensor(coordinator),
+            *(HouseholdHourSensor(coordinator, key) for key in HOUSEHOLD_HOUR_KEYS),
+            *(HouseholdNoticeSensor(coordinator, key) for key in HOUSEHOLD_NOTICE_KEYS),
+        ]
+    )
 
 
 def _number(value: object) -> int | None:
@@ -115,6 +124,61 @@ class BabyTotalSensor(BabyEntity, SensorEntity):
         if data is None:
             return None
         return _instant(data.household.get("day_reset_at"))
+
+
+class HouseholdSetting(HouseholdEntity, SensorEntity):
+    """One of the four hours and offsets the app states for this Household.
+
+    Diagnostic, because none of it is a reading about her: it is what a family
+    typed in Settings, mirrored so their automation can default to it. The point
+    is that an hour is stated **once** — a night window written again in Home
+    Assistant is a second place to keep it in step, and the two drift.
+
+    Unlike the two tells below, these go unavailable with the coordinator. A
+    stale Day Start is worse than no Day Start: an automation reading one would
+    be quiet at the wrong hour and never say why.
+    """
+
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    @property
+    def _stated(self) -> object:
+        """This key's value in the last payload, whatever type it came as."""
+        data = self.coordinator.data
+        if data is None:
+            return None
+        return data.household.get(self.key)
+
+
+class HouseholdHourSensor(HouseholdSetting):
+    """An hour as `HH:MM`, or unknown where the Household keeps none.
+
+    `night_start` is the Night **in force** rather than the stored column, so a
+    Household whose Night Start equals its Day Start reads unknown here — which
+    is what it means: no night.
+    """
+
+    @property
+    def native_value(self) -> str | None:
+        """Nothing at all rather than an empty string when it does not apply."""
+        stated = self._stated
+        return stated if isinstance(stated, str) and stated else None
+
+
+class HouseholdNoticeSensor(HouseholdSetting):
+    """How much warning the app's own reminder gives, in seconds.
+
+    Deliberately no state class: a setting is not a measurement, and a family's
+    recorder should not grow long-term statistics for a number typed once.
+    """
+
+    _attr_device_class = SensorDeviceClass.DURATION
+    _attr_native_unit_of_measurement = UnitOfTime.SECONDS
+
+    @property
+    def native_value(self) -> int | None:
+        """Seconds before a Feed is due, or after a Wake Window is up."""
+        return _number(self._stated)
 
 
 class HubDiagnostic(HouseholdEntity, SensorEntity):
