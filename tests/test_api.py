@@ -33,8 +33,8 @@ def client(hass: HomeAssistant, aioclient_mock: AiohttpClientMocker) -> BabyLogB
 
 def test_a_version_nobody_can_parse_is_not_too_old() -> None:
     """A build from a branch is not a reason to refuse to run."""
-    assert server_is_too_old("1.24.0")
-    assert not server_is_too_old("1.25.0")
+    assert server_is_too_old("1.27.0")
+    assert not server_is_too_old("1.28.0")
     assert not server_is_too_old("")
     assert not server_is_too_old("a-branch-build")
 

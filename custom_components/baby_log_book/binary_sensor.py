@@ -40,11 +40,12 @@ class BabyFlag(BabyEntity, BinarySensorEntity):
 
 
 class CaregivingFlag(HouseholdEntity, BinarySensorEntity):
-    """Whether anybody is looking after her.
+    """Whether the Caregivers, rather than the Parents, have her right now.
 
     A read, never a capability: nothing about it gates a write, and no total is
-    suppressed while it is off. It exists so a family's announce automation can
-    hold its tongue — which is how the switch in the app reaches a wall.
+    suppressed while it is off. Off means the Parents are looking after her
+    themselves, so the shipped blueprint does not read it — a panel in a
+    Caregiver's home is what would.
     """
 
     def __init__(self, coordinator: BabyLogBookCoordinator) -> None:

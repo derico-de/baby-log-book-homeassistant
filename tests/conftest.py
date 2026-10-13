@@ -32,7 +32,7 @@ from custom_components.baby_log_book.const import (
 ORIGIN = "https://babylog.example"
 HOUSEHOLD_ID = "h1"
 BABY_ID = "b1"
-SERVER_VERSION = "1.25.0"
+SERVER_VERSION = "1.28.0"
 ETAG = '"7-2026-08-17-0"'
 
 NOW_MS = 1_724_800_000_000
@@ -99,6 +99,10 @@ def state_payload(babies: list[dict[str, Any]] | None = None, **household: Any) 
             "id": HOUSEHOLD_ID,
             "name": "Zuhause",
             "day_reset_at": DAY_RESET_MS,
+            "day_start": "05:00",
+            "night_start": "21:00",
+            "feed_notice_s": 600,
+            "sleep_notice_s": 300,
             "caregiving": True,
             **household,
         },

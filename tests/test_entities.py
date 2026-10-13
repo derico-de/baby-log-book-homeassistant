@@ -1,4 +1,4 @@
-"""Sixteen entities stand for a Baby, and two for the Household."""
+"""Sixteen entities stand for a Baby, and seven for the Household."""
 
 from __future__ import annotations
 
@@ -45,16 +45,58 @@ async def test_a_baby_has_sixteen_entities(
     assert len(mine) == 7 + 3 + 4 + 6
 
 
-async def test_the_household_carries_its_two(
+async def test_the_household_carries_its_seven(
     hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
 ) -> None:
-    """A diagnostic staleness tell, and the Caregiving flag."""
+    """Two diagnostic tells, four stated settings, and the Caregiving flag."""
     mock_state(aioclient_mock)
     assert await setup_entry(hass, entry, aioclient_mock)
 
     assert hass.states.get("sensor.zuhause_last_update") is not None
     assert state_of(hass, "sensor.zuhause_pending_writes").state == "0"
     assert state_of(hass, "binary_sensor.zuhause_caregiving").state == "on"
+
+
+async def test_the_household_states_its_hours_and_its_two_offsets(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """So an automation defaults to them instead of asking for the hour twice."""
+    mock_state(aioclient_mock)
+    assert await setup_entry(hass, entry, aioclient_mock)
+
+    assert state_of(hass, "sensor.zuhause_day_start").state == "05:00"
+    assert state_of(hass, "sensor.zuhause_night_start").state == "21:00"
+    assert state_of(hass, "sensor.zuhause_feed_reminder").state == "600"
+    assert state_of(hass, "sensor.zuhause_sleep_reminder").state == "300"
+
+
+async def test_a_household_that_keeps_no_night_says_so(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """Unknown, never an empty string — the server sends the Night in force."""
+    mock_state(aioclient_mock, state_payload(night_start=None))
+    assert await setup_entry(hass, entry, aioclient_mock)
+
+    assert state_of(hass, "sensor.zuhause_night_start").state == STATE_UNKNOWN
+    # The Day Start is not a Night Period and does not go with it.
+    assert state_of(hass, "sensor.zuhause_day_start").state == "05:00"
+
+
+async def test_a_stated_hour_goes_unavailable_with_the_coordinator(
+    hass: HomeAssistant, entry: MockConfigEntry, aioclient_mock: AiohttpClientMocker
+) -> None:
+    """A stale Day Start is worse than none: it would be quiet at the wrong hour."""
+    mock_state(aioclient_mock)
+    assert await setup_entry(hass, entry, aioclient_mock)
+
+    aioclient_mock.clear_requests()
+    aioclient_mock.get("https://babylog.example/api/hub/state", status=500)
+    await entry.runtime_data.async_refresh()
+    await hass.async_block_till_done()
+
+    assert state_of(hass, "sensor.zuhause_day_start").state == STATE_UNAVAILABLE
+    # The two tells stay put, as they always do.
+    assert state_of(hass, "sensor.zuhause_last_update").state != STATE_UNAVAILABLE
 
 
 async def test_the_instants_are_instants(
@@ -205,6 +247,8 @@ async def test_unique_ids_are_the_payload_keys(
     assert f"{BABY_ID}_last_feed" in ids
     assert f"{BABY_ID}_bottle_open" in ids
     assert f"{HOUSEHOLD_ID}_last_update" in ids
+    assert f"{HOUSEHOLD_ID}_night_start" in ids
+    assert f"{HOUSEHOLD_ID}_feed_notice_s" in ids
 
 
 async def test_a_stale_baby_s_device_can_be_removed_by_hand(
