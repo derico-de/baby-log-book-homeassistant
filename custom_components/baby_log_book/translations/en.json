@@ -170,8 +170,12 @@
   "services": {
     "log_bottle_feed": {
       "name": "Log a bottle feed",
-      "description": "Logs a bottle for the Baby whose device you target.",
+      "description": "Logs a bottle for the Baby whose device you pick.",
       "fields": {
+        "device_id": {
+          "name": "Baby",
+          "description": "The Baby's device. Pick more than one to log the same bottle for each."
+        },
         "volume_ml": {
           "name": "Volume",
           "description": "How much went into the bottle, in millilitres."
@@ -188,8 +192,12 @@
     },
     "log_nappy": {
       "name": "Log pee & poop",
-      "description": "Logs a pee, a poop or both for the Baby whose device you target — one entry, because they are two facts about one event.",
+      "description": "Logs a pee, a poop or both for the Baby whose device you pick — one entry, because they are two facts about one event.",
       "fields": {
+        "device_id": {
+          "name": "Baby",
+          "description": "The Baby's device. Pick more than one to log the same pee & poop entry for each."
+        },
         "pee": {
           "name": "Pee",
           "description": "Whether there was a pee."

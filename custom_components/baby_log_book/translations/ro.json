@@ -172,6 +172,10 @@
       "name": "Înregistrează un biberon",
       "description": "Înregistrează un biberon pentru bebelușul al cărui dispozitiv îl alegi.",
       "fields": {
+        "device_id": {
+          "name": "Bebeluș",
+          "description": "Dispozitivul bebelușului. Alege mai multe pentru a înregistra același biberon pentru fiecare."
+        },
         "volume_ml": {
           "name": "Cantitate",
           "description": "Cât a intrat în biberon, în mililitri."
@@ -190,6 +194,10 @@
       "name": "Înregistrează pipi & caca",
       "description": "Înregistrează pipi, caca sau amândouă pentru bebelușul al cărui dispozitiv îl alegi — o singură înregistrare, pentru că sunt două fapte despre un singur eveniment.",
       "fields": {
+        "device_id": {
+          "name": "Bebeluș",
+          "description": "Dispozitivul bebelușului. Alege mai multe pentru a înregistra aceeași intrare de pipi & caca pentru fiecare."
+        },
         "pee": {
           "name": "Pipi",
           "description": "Dacă a fost pipi."

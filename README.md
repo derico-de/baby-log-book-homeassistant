@@ -288,11 +288,13 @@ script:
     alias: Emma — 120 ml
     sequence:
       - action: baby_log_book.log_bottle_feed
-        target:
-          device_id: abc123…          # the Baby's device, not a baby id
         data:
+          device_id: abc123…          # the Baby's device, not a baby id
           volume_ml: 120
 ```
+
+The device is a field, not a `target`: the picker offers only this
+integration's Baby devices, and a list of them logs the same bottle for each.
 
 `baby_log_book.log_nappy` logs a pee, a poop or both the same way, with `pee`
 and `poop` and optionally `where` and `consistency`. (The action id is fixed;
@@ -348,4 +350,16 @@ side is real. No live Home Assistant instance is ever started.
 
 ## Licence
 
-AGPL-3.0-or-later, the same as the server. See [LICENSE](LICENSE).
+Copyright (C) 2026 the Baby Log Book contributors.
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See [LICENSE](LICENSE) for the full terms, the same as the
+server.

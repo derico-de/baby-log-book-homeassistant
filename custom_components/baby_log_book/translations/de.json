@@ -172,6 +172,10 @@
       "name": "Flasche erfassen",
       "description": "Erfasst eine Flasche für das Baby, dessen Gerät ausgewählt ist.",
       "fields": {
+        "device_id": {
+          "name": "Baby",
+          "description": "Das Gerät des Babys. Mehrere auswählen, um dieselbe Flasche für jedes zu erfassen."
+        },
         "volume_ml": {
           "name": "Menge",
           "description": "Wie viel in die Flasche kam, in Millilitern."
@@ -190,6 +194,10 @@
       "name": "Pipi & Kaka erfassen",
       "description": "Erfasst Pipi, Kaka oder beides für das Baby, dessen Gerät ausgewählt ist — als ein Eintrag, denn es sind zwei Tatsachen über ein Ereignis.",
       "fields": {
+        "device_id": {
+          "name": "Baby",
+          "description": "Das Gerät des Babys. Mehrere auswählen, um denselben Pipi-&-Kaka-Eintrag für jedes zu erfassen."
+        },
         "pee": {
           "name": "Pipi",
           "description": "Ob es Pipi gab."
